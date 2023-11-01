@@ -31,8 +31,7 @@ def readFromFile(fileName: str) -> (list, str, str, str):
         # reading through all the map coordinates and saving as a 2D list
         for _, line in enumerate(f):
             strLine = line.split(' ')
-            intLine = [eval(i) for i in strLine]
-            board.append(intLine)
+            board.append(strLine)
 
     return board, algorithm, param_value, next_move_player
 
