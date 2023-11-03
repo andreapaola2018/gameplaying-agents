@@ -30,7 +30,7 @@ class Node:
             coordinates = self.__getCoordinatesForColumn(i)
             if coordinates: # if column is not full, generate a child
                 child = Node(self.board, self.player, parent=self)
-                child.coordinates = self.getCoordinatesForColumn(i)
+                child.coordinates = self.__getCoordinatesForColumn(i)
                 self.__generateBoardForChild(child)
                 self.children.append(child)
                 
