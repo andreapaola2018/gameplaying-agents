@@ -16,6 +16,7 @@ class Node:
                 child = Node(self.board, self.player, parent=self)
                 child.setCoordinates(self.getCoordinatesForColumn(i))
                 self.children.append(child)
+        return self.children
                 
         # for action in legal_moves:
         #     # Create a new state by applying the action to the current state
@@ -49,17 +50,18 @@ class Node:
 
 
 # Example usage
-current_board = [[0, 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, 0, 0, 0, 0]]
+current_board = [["O", "O", "O", "O", "O", "O", "O"],
+                 ["O", "O", "O", "O", "O", "O", "O"],
+                 ["O", "O", "O", "O", "O", "O", "O"],
+                 ["O", "O", "O", "O", "O", "O", "O"],
+                 ["O", "O", "O", "O", "O", "O", "O"],
+                 ["O", "O", "O", "O", "O", "O", "O"]]
 
 current_player = 1
-root_node = Node(state=current_board, player=current_player)
+root_node = Node(current_board, current_player)
 
 # Implement a function to find legal moves
-legal_moves = find_legal_moves(current_board)
+# legal_moves = find_legal_moves(current_board)
 
-root_node.expand(legal_moves)
+# root_node.expand(legal_moves)
+print(root_node.generateChildren())
