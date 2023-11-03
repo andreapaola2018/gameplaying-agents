@@ -33,26 +33,95 @@ class Node:
                 child.coordinates = self.__getCoordinatesForColumn(i)
                 self.__generateBoardForChild(child)
                 self.children.append(child)
-                
-        # for action in legal_moves:
-        #     # Create a new state by applying the action to the current state
-        #     new_state = apply_action(self.state, action, self.player)
-
-        #     # Determine the next player's turn
-        #     next_player = 1 if self.player == 2 else 2
-
-        #     # Create a child node for the new state
-        #     child_node = Node(state=new_state, player=next_player, parent=self)
-
-        #     # Add the child node to the list of children
-        #     self.children.append(child_node)
-
-        # return self.children
         
-    def isLegalMove(self) -> bool:
-        # TODO
-        pass
-     
+    # Checks the current state of the board to see if the move made is a win, loss, or neither move
+    def checkGameStatus(self) -> str:
+        row = self.coordinates[0]
+        col = self.coordinates[1]
+        playerTile = self.player
+        
+        # check horizontal
+        rightCount = 0
+        leftCount = 0
+        right = col+1
+        left = col-1
+        while right < 7 and self.board[row][right] == playerTile: # count right
+            rightCount += 1
+            right += 1
+        while left >= 0 and self.board[row][left] == playerTile: # count left
+            leftCount += 1
+            left -= 1
+        total = rightCount + leftCount + 1
+        if total >= 4:
+            return "Win H"
+        
+        # check vertical
+        upCount = 0
+        downCount = 0
+        up = row-1
+        down = row+1
+        while down < 6 and self.board[down][col] == playerTile:  # count down
+            downCount += 1
+            down += 1
+        while up >= 0 and self.board[up][col] == playerTile:  # count up
+            upCount += 1
+            up -= 1
+        total = downCount + upCount + 1
+        if total >= 4:
+            return "Win V"
+
+        # check top left to bottom right diagonal
+        upLeftCount = 0
+        downRightCount = 0
+        up = row-1
+        left = col-1
+        down = row+1
+        right = col+1
+        while up >= 0 and left >= 0 and self.board[up][left] == playerTile: # count upLeft
+            upLeftCount += 1
+            left -= 1
+            up -= 1
+        while down < 6 and right < 7 and self.board[down][right] == playerTile: # count downRight
+            downRightCount += 1
+            right += 1
+            down += 1
+        total = upLeftCount + downRightCount + 1
+        if total >= 4:
+            return "Win D1"
+        
+        # check top right to bottom left diagonal
+        upRightCount = 0
+        downLeftCount = 0
+        up = row-1
+        right = col+1
+        down = row+1
+        left = col-1
+        # count upRight
+        while up >= 0 and right < 7 and self.board[up][right] == playerTile:
+            upRightCount += 1
+            right += 1
+            up -= 1
+        # count downLeft
+        while down < 6 and left >= 0 and self.board[down][left] == playerTile:
+            downLeftCount += 1
+            left -= 1
+            down += 1
+        total = upRightCount + downLeftCount + 1
+        if total >= 4:
+            return "Win D2"
+        
+        # If we get to this point, it means one of 2 things:
+        # (1) The move was a loss, which is true if the board is full now, or
+        # (2) The move is neither a win nor a loss
+        
+        # Check if board is full
+        for row in self.board:
+            if "O" in row: # Not full, therefore not a loss
+                return "Neither"
+        
+        # If board was full, then it was a loss
+        return "Loss"
+
     # Will generate a new, updated board for the child, with the tile played by the player in the appropriate coordinates
     def __generateBoardForChild(self, child):
         childBoard = []

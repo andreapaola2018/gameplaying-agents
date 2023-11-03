@@ -37,19 +37,22 @@ def main():
     printMode = sys.argv[2]
     
     board, algorithm, param_value, next_move_player = readFromFile(fileName)
-    print("Original Board:")
-    printBoard(board)
-    print("\n\n")
-    
-    # test Node class:
     root = Node(board, next_move_player)
-    root.generateChildren()
-    root.printChildrenNodes()
+    root.coordinates = [3,3]
+    print(root.checkGameStatus())
+    # print("Original Board:")
+    # printBoard(board)
+    # print("\n\n")
     
-    print("\nOriginal Board Again:")
-    printBoard(root.board)
+    # # test Node class:
+    # root = Node(board, next_move_player)
+    # root.generateChildren()
+    # root.printChildrenNodes()
     
-    play(board, algorithm, param_value, next_move_player, printMode)
+    # print("\nOriginal Board Again:")
+    # printBoard(root.board)
+    
+    # play(board, algorithm, param_value, next_move_player, printMode)
 
 
 
