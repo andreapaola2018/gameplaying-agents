@@ -4,64 +4,146 @@ class Node:
         self.player = player
         self.parent = parent
         self.coordinates = [] # to store the coordinates of the current move made
-        self.children = []  # List to store child nodes
+        self.children: list[Node] = []  # List to store child nodes
         
-    def setCoordinates(self, coordinates):
-        self.coordinates = coordinates
-        self.board[coordinates[0]][coordinates[1]] = self.player
+    def __str__(self):
+        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + "\n" + self.__boardFormatted()
+    
+    def __boardFormatted(self) -> str:
+        if self.board is None:
+            return "No board!"
+        b = ""
+        for row in self.board:
+            b += "["
+            for i in range(7):
+                b += "'" + row[i] + ("', " if i < 6 else "'")
+            b += "]\n"
+        return b
+    
+    def printChildrenNodes(self):
+        for child in self.children:
+            print(child)
 
+    # Generates up to 7 children nodes which represent possible moves for the next player
     def generateChildren(self):
         for i in range(7): # check all 7 columns in board
-            if not self.isColumnFull(i): # if column is not full, generate a child
+            coordinates = self.__getCoordinatesForColumn(i)
+            if coordinates: # if column is not full, generate a child
                 child = Node(self.board, self.player, parent=self)
-                child.setCoordinates(self.getCoordinatesForColumn(i))
+                child.coordinates = self.__getCoordinatesForColumn(i)
+                self.__generateBoardForChild(child)
                 self.children.append(child)
-        return self.children
-                
-        # for action in legal_moves:
-        #     # Create a new state by applying the action to the current state
-        #     new_state = apply_action(self.state, action, self.player)
-
-        #     # Determine the next player's turn
-        #     next_player = 1 if self.player == 2 else 2
-
-        #     # Create a child node for the new state
-        #     child_node = Node(state=new_state, player=next_player, parent=self)
-
-        #     # Add the child node to the list of children
-        #     self.children.append(child_node)
-
-        # return self.children
         
-    def isLegalMove(self) -> bool:
-        pass
+    # Checks the current state of the board to see if the move made is a win, loss, or neither move
+    def checkGameStatus(self) -> str:
+        row = self.coordinates[0]
+        col = self.coordinates[1]
+        playerTile = self.player
+        
+        # check horizontal
+        rightCount = 0
+        leftCount = 0
+        right = col+1
+        left = col-1
+        while right < 7 and self.board[row][right] == playerTile: # count right
+            rightCount += 1
+            right += 1
+        while left >= 0 and self.board[row][left] == playerTile: # count left
+            leftCount += 1
+            left -= 1
+        total = rightCount + leftCount + 1
+        if total >= 4:
+            return "Win H"
+        
+        # check vertical
+        upCount = 0
+        downCount = 0
+        up = row-1
+        down = row+1
+        while down < 6 and self.board[down][col] == playerTile:  # count down
+            downCount += 1
+            down += 1
+        while up >= 0 and self.board[up][col] == playerTile:  # count up
+            upCount += 1
+            up -= 1
+        total = downCount + upCount + 1
+        if total >= 4:
+            return "Win V"
+
+        # check top left to bottom right diagonal
+        upLeftCount = 0
+        downRightCount = 0
+        up = row-1
+        left = col-1
+        down = row+1
+        right = col+1
+        while up >= 0 and left >= 0 and self.board[up][left] == playerTile: # count upLeft
+            upLeftCount += 1
+            left -= 1
+            up -= 1
+        while down < 6 and right < 7 and self.board[down][right] == playerTile: # count downRight
+            downRightCount += 1
+            right += 1
+            down += 1
+        total = upLeftCount + downRightCount + 1
+        if total >= 4:
+            return "Win D1"
+        
+        # check top right to bottom left diagonal
+        upRightCount = 0
+        downLeftCount = 0
+        up = row-1
+        right = col+1
+        down = row+1
+        left = col-1
+        # count upRight
+        while up >= 0 and right < 7 and self.board[up][right] == playerTile:
+            upRightCount += 1
+            right += 1
+            up -= 1
+        # count downLeft
+        while down < 6 and left >= 0 and self.board[down][left] == playerTile:
+            downLeftCount += 1
+            left -= 1
+            down += 1
+        total = upRightCount + downLeftCount + 1
+        if total >= 4:
+            return "Win D2"
+        
+        # If we get to this point, it means one of 2 things:
+        # (1) The move was a loss, which is true if the board is full now, or
+        # (2) The move is neither a win nor a loss
+        
+        # Check if board is full
+        for row in self.board:
+            if "O" in row: # Not full, therefore not a loss
+                return "Neither"
+        
+        # If board was full, then it was a loss
+        return "Loss"
+
+    # Will generate a new, updated board for the child, with the tile played by the player in the appropriate coordinates
+    def __generateBoardForChild(self, child):
+        childBoard = []
+        for row in self.board:
+            letters = []
+            for l in row:
+                letters.append(l)
+            childBoard.append(letters)
+        childBoard[child.coordinates[0]][child.coordinates[1]] = child.player
+        child.board = childBoard
     
-    def isColumnFull(self, index) -> bool:
-        if self.board[0][index] == "O": # if it's an O, column is not full
-            return False
-        return True
-    
-    def getCoordinatesForColumn(self, colIndex):
+    # Given a column index, will first check if that column is full (as in no more tiles can be put in that column)
+    # If full, returns None. If not full, will return the coordinates of the next position in which a tile fits.
+    def __getCoordinatesForColumn(self, colIndex):
+        if self.__isColumnFull(colIndex):
+            return None
         for i in range(5,0,-1):
             if self.board[i][colIndex] == "O": # empty spot
                 return [i, colIndex]
-        return [-1,-1] # column is full
         
-
-
-# Example usage
-current_board = [["O", "O", "O", "O", "O", "O", "O"],
-                 ["O", "O", "O", "O", "O", "O", "O"],
-                 ["O", "O", "O", "O", "O", "O", "O"],
-                 ["O", "O", "O", "O", "O", "O", "O"],
-                 ["O", "O", "O", "O", "O", "O", "O"],
-                 ["O", "O", "O", "O", "O", "O", "O"]]
-
-current_player = 1
-root_node = Node(current_board, current_player)
-
-# Implement a function to find legal moves
-# legal_moves = find_legal_moves(current_board)
-
-# root_node.expand(legal_moves)
-print(root_node.generateChildren())
+    # Helper method that returns true if a column for a given index is full, false otherwise
+    def __isColumnFull(self, colIndex) -> bool:
+        if self.board[0][colIndex] == "O":  # if it's an O, column is not full
+            return False
+        return True
