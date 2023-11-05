@@ -3,6 +3,8 @@ class Node:
         self.board: list = board
         self.player = player
         self.parent = parent
+        self.wins = 0
+        self.numSims = 0
         self.coordinates = [] # to store the coordinates of the current move made
         self.children: list[Node] = []  # List to store child nodes
         
@@ -23,16 +25,20 @@ class Node:
     def printChildrenNodes(self):
         for child in self.children:
             print(child)
+            
+    def val(self):
+        return str(self.wins) + "/" + str(self.numSims)
 
     # Generates up to 7 children nodes which represent possible moves for the next player
-    def generateChildren(self):
+    def generateChildren(self, nextMovePlayer: str):
         for i in range(7): # check all 7 columns in board
-            coordinates = self.__getCoordinatesForColumn(i)
-            if coordinates: # if column is not full, generate a child
-                child = Node(self.board, self.player, parent=self)
-                child.coordinates = self.__getCoordinatesForColumn(i)
-                self.__generateBoardForChild(child)
-                self.children.append(child)
+            if not self.__isColumnFull(i):
+                coordinates = self.__getCoordinatesForColumn(i)
+                if coordinates: # if column is not full, generate a child
+                    child = Node(self.board, nextMovePlayer, parent=self)
+                    child.coordinates = self.__getCoordinatesForColumn(i)
+                    self.__generateBoardForChild(child)
+                    self.children.append(child)
         
     # Checks the current state of the board to see if the move made is a win, loss, or neither move
     def checkGameStatus(self) -> str:
@@ -53,7 +59,7 @@ class Node:
             left -= 1
         total = rightCount + leftCount + 1
         if total >= 4:
-            return "Win H"
+            return "Win"
         
         # check vertical
         upCount = 0
@@ -68,7 +74,7 @@ class Node:
             up -= 1
         total = downCount + upCount + 1
         if total >= 4:
-            return "Win V"
+            return "Win"
 
         # check top left to bottom right diagonal
         upLeftCount = 0
@@ -87,7 +93,7 @@ class Node:
             down += 1
         total = upLeftCount + downRightCount + 1
         if total >= 4:
-            return "Win D1"
+            return "Win"
         
         # check top right to bottom left diagonal
         upRightCount = 0
@@ -108,7 +114,7 @@ class Node:
             down += 1
         total = upRightCount + downLeftCount + 1
         if total >= 4:
-            return "Win D2"
+            return "Win"
         
         # If we get to this point, it means one of 2 things:
         # (1) The move was a loss, which is true if the board is full now, or
@@ -121,6 +127,9 @@ class Node:
         
         # If board was full, then it was a loss
         return "Loss"
+    
+    def mcts_value(self) -> int:
+        return 0 if self.numSims == 0 else self.wins/self.numSims
 
     # Will generate a new, updated board for the child, with the tile played by the player in the appropriate coordinates
     def __generateBoardForChild(self, child):
@@ -136,7 +145,7 @@ class Node:
     # Given a column index, will first check if that column is full (as in no more tiles can be put in that column)
     # If full, returns None. If not full, will return the coordinates of the next position in which a tile fits.
     def __getCoordinatesForColumn(self, colIndex):
-        if self.__isColumnFull(colIndex):
+        if self.__isColumnFull(colIndex): # technically should not happen since is checked before this method is called
             return None
         for i in range(5,0,-1):
             if self.board[i][colIndex] == "O": # empty spot
