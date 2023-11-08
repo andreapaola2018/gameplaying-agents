@@ -25,15 +25,15 @@ class Node:
             print(child)
 
     # Generates up to 7 children nodes which represent possible moves for the next player
-    def generateChildren(self):
+    def generateChildren(self, nextMovePlayer: str):
         for i in range(7): # check all 7 columns in board
-            coordinates = self.__getCoordinatesForColumn(i)
-            if coordinates: # if column is not full, generate a child
-                child = Node(self.board, self.player, parent=self)
-                child.coordinates = self.__getCoordinatesForColumn(i)
-                self.__generateBoardForChild(child)
-                self.children.append(child)
-        
+            if not self.__isColumnFull(i):
+                coordinates = self.__getCoordinatesForColumn(i)
+                if coordinates: # if column is not full, generate a child
+                    child = Node(self.board, nextMovePlayer, parent=self)
+                    child.coordinates = self.__getCoordinatesForColumn(i)
+                    self.__generateBoardForChild(child)
+                    self.children.append(child)
     # Checks the current state of the board to see if the move made is a win, loss, or neither move
     def checkGameStatus(self) -> str:
         row = self.coordinates[0]
