@@ -39,7 +39,7 @@ class Node:
                     child.coordinates = self.__getCoordinatesForColumn(i)
                     self.__generateBoardForChild(child)
                     self.children.append(child)
-        
+                    
     # Checks the current state of the board to see if the move made is a win, loss, or neither move
     def checkGameStatus(self) -> str:
         row = self.coordinates[0]
