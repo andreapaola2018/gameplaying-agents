@@ -28,7 +28,7 @@ import random
 # OYRYOYR 
 # YRRYORR
 
-def monte_carlo(board: list, paramValue: str, nextMovePlayer: str, printMode: str):
+def monte_carlo(board: list, paramValue: str, nextMovePlayer: str, printMode: str, uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
     root = Node(board, prevMovePlayer)
     root.generateChildren(nextMovePlayer)
