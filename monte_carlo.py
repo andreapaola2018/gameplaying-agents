@@ -1,98 +1,122 @@
 from node import Node
 import random
-# This algorithm is the simplest form of game tree search based on 
-# randomized rollouts. It is essentially the UCT algorithm without a 
-# sophisticated tree search policy. Please refer to https: 
-# // en.wikipedia.org/wiki/Monte_Carlo_tree_search for detailed descriptions
-# and examples for both PMCGS and UCT(of course you can also use the course 
-# slides, textbook, and other references as needed). The main steps in this 
-# algorithm are the same as in UCT, but every move both within the tree 
-# search and the rollout is made at random. Output the value for each of 
-# the immediate next moves(with Null for illegal moves) and the move 
-# selected at the end. Only if the “Verbose” mode is selected you should 
-# also print out additional information during each simulation trace, as 
-# shown below. For each node in the search tree output the current values 
-# of wi and ni, and the move selected. When you reach a leaf in the current 
-# tree and add a new node print “NODE ADDED”. For the rollout print only 
-# the moves selected, and when you reach a terminal node print the value as 
-# “TERMINAL NODE VALUE: X” where X is -1, 0, or 1. Then print the updated 
-# values.
+from PrettyPrint import PrettyPrintTree
 
-# UR
-# 0
-# R 
-# OOOOOOO 
-# OOOOOOO 
-# OOYOOOY 
-# OOROOOY 
-# OYRYOYR 
-# YRRYORR
-
-def monte_carlo(board: list, paramValue: str, nextMovePlayer: str, printMode: str, uct: bool = False):
+def monteCarloTreeSearch(board: list, paramValue: int, nextMovePlayer: str, printMode: str, uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
     root = Node(board, prevMovePlayer)
     root.generateChildren(nextMovePlayer)
     
-    node = selectChildNode(root)
-    expand(node)
-    rollOut(node, nextMovePlayer)
+    # Runs for paramValue times
+    for _ in range(paramValue):
+        node = selectChildNode(root)
+        print("selected node: ", node)
+        # if the selected node turns out to be a terminal move, we can't roll out any more moves
+        # therefore, expand will return a boolean to let us know if we can or cannot expand on that node
+        isExpandable = expand(node)
+        if isExpandable: # if we can expand, we roll out simulations and back propagate from the returned leaf
+            leaf = rollOut(node)
+            backPropagate(leaf, nextMovePlayer)
+        else: # else, we back propagate from the selected node, which turned out to be a non-expandable leaf
+            backPropagate(node, nextMovePlayer)
+        
+    # once it is done running simulations, must choose the move with the max mcts value
+    # root.printChildrenNodes()
+    printTree(root)
     
-    pass
+    return max(root.children, key=lambda n: n.mctsValueInt())
+  
+
+def printTree(root: Node):
+    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.mctsValueStr())
+    pt(root)
     
 def selectChildNode(root: Node) -> Node:
     selected = root
-    while len(selected.children) != 0: # while we have not found a lead node
-        max_child_value = max(root.children, key=lambda n: n.mcts_value()).mcts_value()
-        # select all children with the highest win/numSims ratio
-        max_children = [n for n in root.children if n.mcts_value() == max_child_value]
+    while len(selected.children) != 0: # while we have not found a leaf node
+        maxSims = max(selected.children, key=lambda n: n.numSims).numSims
         
-        # choose one at random
-        selected = random.choice(max_children)
+        if maxSims == 0: # this means that none of the children have been explored (no simulations have been run in any!)
+            # select one at random
+            return random.choice(selected.children)
         
-        # if the randomly selected child has not yet been explored, return that one
-        if selected.numSims == 0:
-            return selected
+        # we want to prioritize exploring children that have not been explored yet
+        unexploredChildren = [n for n in selected.children if n.numSims == 0]
+        if len(unexploredChildren) != 0: # this means that there exists at least 1 child that has not been explored yet
+            return random.choice(unexploredChildren)
+            
+        # if we reach here, it means all children have been explored, therefore we want to traverse
+        # the child with the highest mcts value to find a leaf node
+        maxChildValue = max(selected.children, key=lambda n: n.mctsValueInt()).mctsValueInt()
+        maxChildren = [n for n in selected.children if n.mctsValueInt() == maxChildValue]
+        
+        # if there are ties for the highest mcts value, choose one at random
+        selected = random.choice(maxChildren)
+        selected.generateChildren(flipPlayer(selected))
     
     # found leaf, return
     return selected
 
-def expand(node: Node):
-    # first check if selected node to expand on is a winning/losing move
+def expand(node: Node) -> bool:
+    # first check if selected node to expand on is a winning move
     # if so, cannot expand further, so just return
     gameStatus = node.checkGameStatus()
-    if gameStatus == "Win" or gameStatus == "Loss":
-        return
-
-    # if neither win nor loss, expand
-    node.generateChildren("Y" if node.player == "R" else "R")
+    if (gameStatus == -1 and node.player == "R") or (gameStatus == 1 and node.player == "Y"):
+        print("Win!")
+        return False
     
-def rollOut(node: Node, nextMovePlayer: str):
+    # second, check if the selected node to expand on is a draw move (meaning the board is now full!)
+    # if so, cannot expand further, so just return
+    if gameStatus == 0:
+        print("draw!")
+        return False
+
+    # if neither win nor draw, expand
+    node.generateChildren(flipPlayer(node))
+    return True
+    
+def rollOut(node: Node):
     nextMove = node
-    gameStatus = "Neither"
     
     while True:
         # choose a move at random from the children of the node
         nextMove = random.choice(nextMove.children)
         gameStatus = nextMove.checkGameStatus()
         
-        if gameStatus != "Neither":
+        if gameStatus != None: # if the game status is win or draw, we are done rolling out simulations
+            # reached terminal node!
             break
         
-        nextMove.generateChildren("Y" if nextMove.player == "R" else "R")
+        nextMove.generateChildren(flipPlayer(nextMove))
         
-        if len(nextMove.children) == 0:
+        if len(nextMove.children) == 0: # If we could not generate more children, it means a terminal state was reached
+            # Note: This if statement is here as a precaution, given the if statement above, this should never happen
             print("Children empty, game status: ", gameStatus)
+            print("current child: ", nextMove)
             break
 
-    gameStatus = "Win" if nextMove.player == nextMovePlayer else "Loss"
-    return nextMove, gameStatus # return the leaf node that we end up at and the game outcome
+    return nextMove # return the leaf node that we end up at
 
-def backPropagate(leaf: Node, gameOutcome: str, nextMovePlayer: str):
-    numSims = 0
-    numWins = 0
+def backPropagate(leaf: Node, nextMovePlayer: str):
+    #numSims = 0
+    gameOutcome = leaf.checkGameStatus()
+    # Since this is a leaf node, the game outcome should be either a win or a draw
+    # if this is not the case, clearly there was an error somewhere
+    if gameOutcome is None:
+        print("Error in leaf node")
+        print("Leaf that has error: ", leaf)
+        return
+    
+    print("Leaf in back propagate: ", leaf)
+    print("Game outcome: ", gameOutcome)
+    
     while leaf:
-        leaf.numSims += + numSims + 1
-        leaf.wins = (numWins + 1) if (gameOutcome == "Win") else 0
+        leaf.numSims += 1
+        # if the player we simulated the moves for won the game, increment number of wins
+        if ((gameOutcome == -1 and nextMovePlayer == "R") or (gameOutcome == 1 and nextMovePlayer == "Y")): 
+            leaf.wins += 1
         leaf = leaf.parent # go back up
-        numSims += 1
+        # numSims += 1
         
+def flipPlayer(node: Node) -> str:
+    return "Y" if node.player == "R" else "R"

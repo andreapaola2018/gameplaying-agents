@@ -5,18 +5,18 @@ from monte_carlo import *
 from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
-def play(board: list, algorithm: str, paramValue: str, nextMovePlayer: str, printMode: str):
+def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
     if algorithm == "UR":
         pass
     elif algorithm == "PMCGS":
-        monte_carlo(board, paramValue, nextMovePlayer, printMode)
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
         # root = Node(board, "Y" if nextMovePlayer == "R" else "R")
         # root.generateChildren(nextMovePlayer)
-        # # print("Root's children:")
-        # # root.printChildrenNodes()
+        # print("Root's children:")
+        # root.printChildrenNodes()
         # child = selectChildNode(root)
-        # # print("Selected child:")
-        # # print(child)
+        # print("Selected child:")
+        # print(child)
         # # print("Expanding child...")
         # expand(child)
         # # child.printChildrenNodes()
@@ -35,7 +35,7 @@ def play(board: list, algorithm: str, paramValue: str, nextMovePlayer: str, prin
         
         # printTree(root)
     elif algorithm == "UCT":
-        monte_carlo(board, paramValue, nextMovePlayer, printMode, True)
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
         
         
 def printTree(root: Node):
@@ -54,7 +54,7 @@ def readFromFile(fileName: str) -> (list, str, int, str):
    # reading the file
     with open(fileName, 'r') as f:
         algorithm = f.readline().strip()  # algorithm name
-        param_value = f.readline().strip()  # parameter value
+        param_value = int(f.readline().strip()) # parameter value
         next_move_player = f.readline().strip()  # player who will make the next move
 
         # reading through all the map coordinates and saving as a 2D list
@@ -63,7 +63,6 @@ def readFromFile(fileName: str) -> (list, str, int, str):
             board.append(letters)
             
     return board, algorithm, param_value, next_move_player
-
 
 # main method
 def main():
