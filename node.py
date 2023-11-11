@@ -9,7 +9,7 @@ class Node:
         self.children: list[Node] = []  # List to store child nodes
         
     def __str__(self):
-        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + "\n" + self.__boardFormatted()
+        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + " MCTS value: " + str(self.mctsValueInt()) + "\n" + self.__boardFormatted()
     
     def __boardFormatted(self) -> str:
         if self.board is None:
@@ -26,8 +26,11 @@ class Node:
         for child in self.children:
             print(child)
             
-    def val(self):
+    def mctsValueStr(self):
         return str(self.wins) + "/" + str(self.numSims)
+    
+    def mctsValueInt(self) -> int:
+        return 0 if self.numSims == 0 else self.wins/self.numSims
 
     # Generates up to 7 children nodes which represent possible moves for the next player
     def generateChildren(self, nextMovePlayer: str):
@@ -40,7 +43,7 @@ class Node:
                     self.__generateBoardForChild(child)
                     self.children.append(child)
                     
-    # Checks the current state of the board to see if the move made is a win, loss, or neither move
+    # Checks the current state of the board to see if the move made is a win, draw, or neither
     def checkGameStatus(self) -> str:
         row = self.coordinates[0]
         col = self.coordinates[1]
@@ -59,7 +62,8 @@ class Node:
             left -= 1
         total = rightCount + leftCount + 1
         if total >= 4:
-            return "Win"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1 
         
         # check vertical
         upCount = 0
@@ -74,7 +78,8 @@ class Node:
             up -= 1
         total = downCount + upCount + 1
         if total >= 4:
-            return "Win"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1
 
         # check top left to bottom right diagonal
         upLeftCount = 0
@@ -93,7 +98,8 @@ class Node:
             down += 1
         total = upLeftCount + downRightCount + 1
         if total >= 4:
-            return "Win"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1
         
         # check top right to bottom left diagonal
         upRightCount = 0
@@ -114,22 +120,21 @@ class Node:
             down += 1
         total = upRightCount + downLeftCount + 1
         if total >= 4:
-            return "Win"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1
         
         # If we get to this point, it means one of 2 things:
-        # (1) The move was a loss, which is true if the board is full now, or
-        # (2) The move is neither a win nor a loss
+        # (1) The move was a draw, which is true if the board is full now, or
+        # (2) The move is neither a win nor a draw, and the board still has empty spaces for more moves
         
         # Check if board is full
         for row in self.board:
-            if "O" in row: # Not full, therefore not a loss
-                return "Neither"
+            if "O" in row: # Not full, therefore not a draw
+                # return None, meaning there are still moves left that can be made
+                return None
         
-        # If board was full, then it was a loss
-        return "Loss"
-    
-    def mcts_value(self) -> int:
-        return 0 if self.numSims == 0 else self.wins/self.numSims
+        # If board was full, then it was a draw since there were no winners
+        return 0
 
     # Will generate a new, updated board for the child, with the tile played by the player in the appropriate coordinates
     def __generateBoardForChild(self, child):
@@ -147,7 +152,7 @@ class Node:
     def __getCoordinatesForColumn(self, colIndex):
         if self.__isColumnFull(colIndex): # technically should not happen since is checked before this method is called
             return None
-        for i in range(5,0,-1):
+        for i in range(5,-1,-1):
             if self.board[i][colIndex] == "O": # empty spot
                 return [i, colIndex]
         
