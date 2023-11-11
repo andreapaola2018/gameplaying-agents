@@ -1,13 +1,17 @@
 # Entry point for our program
 import sys
-from mcts_node import MonteCarloNode
+# from minimax import *
+from uniform_random import *
+from node import Node
 from monte_carlo import *
-from PrettyPrint import PrettyPrintTree
+import math
+# from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
 def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
+    print(algorithm)
     if algorithm == "UR":
-        pass
+        uniform_random(board, nextMovePlayer, printMode)
     elif algorithm == "PMCGS":
         monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
         # root = Node(board, "Y" if nextMovePlayer == "R" else "R")
@@ -36,11 +40,20 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
         # printTree(root)
     elif algorithm == "UCT":
         monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
+
+    elif algorithm == "DLMM": 
+        print("dlmm")
+        # alpha = -math.inf
+        # beta = math.inf
+        # maximizing_player == True if nextMovePlayer == "Y" else False
+        # ##param value here is the depth 
+        # minimax_alpha_beta(board, root, paramValue, alpha, beta, maximizing_player, nextMovePlayer)
+
         
         
-def printTreeMcts(root: MonteCarloNode):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
-    pt(root)
+# def printTree(root: Node):
+#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
+#     pt(root)
 
 def printBoard(board: list):
     for row in board:
@@ -53,6 +66,8 @@ def readFromFile(fileName: str) -> (list, str, int, str):
 
    # reading the file
     with open(fileName, 'r') as f:
+        algorithm = f.readline().strip()  # algorithm name
+        param_value = int(f.readline().strip()) # parameter value
         algorithm = f.readline().strip()  # algorithm name
         param_value = int(f.readline().strip()) # parameter value
         next_move_player = f.readline().strip()  # player who will make the next move
@@ -70,6 +85,8 @@ def main():
     printMode = sys.argv[2]
     
     board, algorithm, param_value, next_move_player = readFromFile(fileName)
+    
+    play(board, algorithm, param_value, next_move_player, printMode)
     
     play(board, algorithm, param_value, next_move_player, printMode)
 
