@@ -1,12 +1,59 @@
 # Entry point for our program
 import sys
+# from minimax import *
+from uniform_random import *
 from node import Node
+from monte_carlo import *
+import math
+# from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
-def play(board: list, algorithm: str, param_value: str, next_move_player: str, printMode: str):
+def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
+    print(algorithm)
     if algorithm == "UR":
-        print("in UR")
-    return algorithm
+        uniform_random(board, nextMovePlayer, printMode)
+    elif algorithm == "PMCGS":
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
+        # root = Node(board, "Y" if nextMovePlayer == "R" else "R")
+        # root.generateChildren(nextMovePlayer)
+        # print("Root's children:")
+        # root.printChildrenNodes()
+        # child = selectChildNode(root)
+        # print("Selected child:")
+        # print(child)
+        # # print("Expanding child...")
+        # expand(child)
+        # # child.printChildrenNodes()
+        # # print("Performing roll out...")
+        # leaf, gameStatus = rollOut(child, nextMovePlayer)
+        # print("Game status: ", gameStatus)
+        # print(leaf)
+        # backPropagate(leaf, gameStatus, nextMovePlayer)
+        
+        # child = selectChildNode(root)
+        # expand(child)
+        # leaf, gameStatus = rollOut(child, nextMovePlayer)
+        # backPropagate(leaf, gameStatus, nextMovePlayer)
+        # print("Game status: ", gameStatus)
+        # print(leaf)
+        
+        # printTree(root)
+    elif algorithm == "UCT":
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
+
+    elif algorithm == "DLMM": 
+        print("dlmm")
+        # alpha = -math.inf
+        # beta = math.inf
+        # maximizing_player == True if nextMovePlayer == "Y" else False
+        # ##param value here is the depth 
+        # minimax_alpha_beta(board, root, paramValue, alpha, beta, maximizing_player, nextMovePlayer)
+
+        
+        
+# def printTree(root: Node):
+#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
+#     pt(root)
 
 def printBoard(board: list):
     for row in board:
@@ -19,8 +66,8 @@ def readFromFile(fileName: str) -> (list, str, int, str):
 
    # reading the file
     with open(fileName, 'r') as f:
-        algorithm = f.readline()  # algorithm name
-        param_value = f.readline()  # parameter value
+        algorithm = f.readline().strip()  # algorithm name
+        param_value = int(f.readline().strip()) # parameter value
         next_move_player = f.readline().strip()  # player who will make the next move
 
         # reading through all the map coordinates and saving as a 2D list
@@ -30,29 +77,14 @@ def readFromFile(fileName: str) -> (list, str, int, str):
             
     return board, algorithm, param_value, next_move_player
 
-
 # main method
 def main():
     fileName = sys.argv[1]
     printMode = sys.argv[2]
     
     board, algorithm, param_value, next_move_player = readFromFile(fileName)
-    root = Node(board, next_move_player)
-    root.coordinates = [3,3]
-    print(root.checkGameStatus())
-    # print("Original Board:")
-    # printBoard(board)
-    # print("\n\n")
     
-    # # test Node class:
-    # root = Node(board, next_move_player)
-    # root.generateChildren()
-    # root.printChildrenNodes()
-    
-    # print("\nOriginal Board Again:")
-    # printBoard(root.board)
-    
-    # play(board, algorithm, param_value, next_move_player, printMode)
+    play(board, algorithm, param_value, next_move_player, printMode)
 
 
 
