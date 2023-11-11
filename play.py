@@ -4,6 +4,7 @@ import sys
 from uniform_random import *
 from node import Node
 from monte_carlo import *
+from minimax import *
 import math
 # from PrettyPrint import PrettyPrintTree
 
@@ -42,13 +43,11 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
         monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
 
     elif algorithm == "DLMM": 
-        print("dlmm")
-        # alpha = -math.inf
-        # beta = math.inf
-        # maximizing_player == True if nextMovePlayer == "Y" else False
-        # ##param value here is the depth 
-        # minimax_alpha_beta(board, root, paramValue, alpha, beta, maximizing_player, nextMovePlayer)
+        # root node with the initial game state
+        root = Node(board, 'Y', True, paramValue)
 
+        # Evaluate immediate moves and select the final move
+        final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
         
         
 # def printTree(root: Node):
