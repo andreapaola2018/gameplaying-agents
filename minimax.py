@@ -23,10 +23,6 @@ class Node:
                 b += "'" + row[i] + ("', " if i < 6 else "'")
             b += "]\n"
         return b
-    
-    def printChildrenNodes(self):
-        for child in self.children:
-            print(child)
 
     # Generates up to 7 children nodes which represent possible moves for the next player
     def generateChildren(self, nextMovePlayer: str, maximizingPlayer, depth):
@@ -117,10 +113,6 @@ class Node:
         if total >= 4:
             # if Red won -> return -1, if Yellow won -> return 1
             return -1 if self.player == "R" else 1
-        
-        # If we get to this point, it means one of 2 things:
-        # (1) The move was a draw, which is true if the board is full now, or
-        # (2) The move is neither a win nor a draw, and the board still has empty spaces for more moves
         
         # Check if board is full
         for row in self.board:
@@ -226,34 +218,6 @@ class Node:
             lines += 1
 
         return lines
-
-    # def heuristic_evaluation(self, maximizingPlayer):
-    #     ##determines if current player is maximizing player, sets opponent and current player 
-    #     player = self.player if maximizingPlayer else 'Y' if self.player == 'R' else 'R'
-    #     opponent = 'R' if player == 'Y' else 'Y'
-
-    #     # Count lines of 2 or 3 pieces that can be extended for each player
-    #     player_lines = 0
-    #     opponent_lines = 0
-
-    #     # Horizontal lines
-    #     for row in range(6):
-    #         for col in range(4):
-    #             line = [self.board[row][col], self.board[row][col + 1], self.board[row][col + 2], self.board[row][col + 3]]
-    #             player_lines += line.count(player)
-    #             opponent_lines += line.count(opponent)
-
-    #     # Vertical lines
-    #     for col in range(7):
-    #         for row in range(3):
-    #             line = [self.board[row][col], self.board[row + 1][col], self.board[row + 2][col], self.board[row + 3][col]]
-    #             player_lines += line.count(player)
-    #             opponent_lines += line.count(opponent)
-
-    #     # You can add more evaluations for diagonal lines, or more sophisticated patterns
-        
-    #     # Return a value between -1 and 1 (for example, normalize the count of lines)
-    #     return (player_lines - opponent_lines) / 21  # 21 being the maximum possible lines to create (6 * 4 + 7 * 3)
     
     def evaluate_immediate_moves(self, depth):
 
@@ -280,22 +244,6 @@ class Node:
 
         return selected_move
 
-board = [
-    ['O', 'O', 'O', 'O', 'O', 'O', 'O'],
-    ['O', 'O', 'Y', 'O', 'O', 'O', 'Y'],
-    ['O', 'O', 'Y', 'O', 'O', 'O', 'Y'],
-    ['O', 'O', 'R', 'O', 'O', 'O', 'Y'],
-    ['O', 'Y', 'R', 'O', 'O', 'O', 'R'],
-    ['Y', 'R', 'R', 'Y', 'O', 'R', 'R']
-]
-
-# root node with the initial game state
-root = Node(board, 'Y', True, 3)
-
-# Evaluate immediate moves and select the final move
-final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
-
 # depth = 4
-# # Get the best move
 # best_move = root.bestMove(depth)
 # print("Best Move:", best_move)
