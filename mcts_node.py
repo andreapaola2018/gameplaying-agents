@@ -1,15 +1,19 @@
-class Node:
-    def __init__(self, board, player, maximizingPlayer, depth, parent=None):
+import math
+
+EXPLORATION_PARAMETER: int = math.sqrt(2)
+
+class MonteCarloNode:
+    def __init__(self, board, player, parent=None):
         self.board: list = board
         self.player = player
         self.parent = parent
-        self.depth = depth
-        self.maximizingPlayer = maximizingPlayer
+        self.wins = 0
+        self.numSims = 0
         self.coordinates = [] # to store the coordinates of the current move made
-        self.children: list[Node] = []  # List to store child nodes
+        self.children: list[MonteCarloNode] = []  # List to store child nodes
         
     def __str__(self):
-        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + "\n" + self.__boardFormatted()
+        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + " MCTS value: " + str(self.pureMctsValueInt()) + "\n" + self.__boardFormatted()
     
     def __boardFormatted(self) -> str:
         if self.board is None:
@@ -25,18 +29,30 @@ class Node:
     def printChildrenNodes(self):
         for child in self.children:
             print(child)
+            
+    def pureMctsValueStr(self) -> str:
+        return str(self.wins) + "/" + str(self.numSims)
+    
+    def pureMctsValueInt(self) -> int:
+        return 0 if self.numSims == 0 else self.wins/self.numSims
+    
+    def uctValueInt(self, rootNumSims):
+        if self.numSims == 0:
+            return self.pureMctsValueStr()
+        return (self.wins / self.numSims) + (EXPLORATION_PARAMETER * math.sqrt(math.log(rootNumSims) / self.numSims))
 
     # Generates up to 7 children nodes which represent possible moves for the next player
-    def generateChildren(self, nextMovePlayer: str, maximizingPlayer, depth):
+    def generateChildren(self, nextMovePlayer: str):
         for i in range(7): # check all 7 columns in board
             if not self.__isColumnFull(i):
                 coordinates = self.__getCoordinatesForColumn(i)
                 if coordinates: # if column is not full, generate a child
-                    child = Node(self.board, nextMovePlayer, maximizingPlayer, depth, parent=None)
+                    child = MonteCarloNode(self.board, nextMovePlayer, parent=self)
                     child.coordinates = self.__getCoordinatesForColumn(i)
                     self.__generateBoardForChild(child)
                     self.children.append(child)
-    # Checks the current state of the board to see if the move made is a win, loss, or neither move
+                    
+    # Checks the current state of the board to see if the move made is a win, draw, or neither
     def checkGameStatus(self) -> str:
         row = self.coordinates[0]
         col = self.coordinates[1]
@@ -139,13 +155,13 @@ class Node:
             childBoard.append(letters)
         childBoard[child.coordinates[0]][child.coordinates[1]] = child.player
         child.board = childBoard
- 
+    
     # Given a column index, will first check if that column is full (as in no more tiles can be put in that column)
     # If full, returns None. If not full, will return the coordinates of the next position in which a tile fits.
     def __getCoordinatesForColumn(self, colIndex):
-        if self.__isColumnFull(colIndex):
+        if self.__isColumnFull(colIndex): # technically should not happen since is checked before this method is called
             return None
-        for i in range(5,0,-1):
+        for i in range(5,-1,-1):
             if self.board[i][colIndex] == "O": # empty spot
                 return [i, colIndex]
         

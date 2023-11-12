@@ -21,16 +21,3 @@ def generate_random_child(root: Node) -> Node:
     
     return random_child
 
-
-# board = [
-#     ["O", "O", "O", "O", "O", "O", "O"],
-#     ["O", "O", "O", "O", "O", "O", "O"],    
-#     ["O", "O", "O", "O", "O", "O", "O"],    
-#     ["O", "O", "O", "O", "O", "O", "O"],
-#     ["O", "O", "O", "O", "O", "O", "O"],
-#     ["O", "O", "O", "Y", "O", "O", "O"],]
-
-# nextMovePlayer = "R"
-# printMode = "verbose"
-
-# print("Move selected: ", uniform_random(board, nextMovePlayer, printMode))
