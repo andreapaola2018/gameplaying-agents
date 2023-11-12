@@ -1,12 +1,10 @@
 # Entry point for our program
 import sys
-# from minimax import *
 from uniform_random import *
 from node import Node
 from monte_carlo import *
 from minimax import *
-import math
-# from PrettyPrint import PrettyPrintTree
+from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
 def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
@@ -48,11 +46,10 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
 
         # Evaluate immediate moves and select the final move
         final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
-        
-        
-# def printTree(root: Node):
-#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
-#     pt(root)
+                
+def printTree(root: Node):
+    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
+    pt(root)
 
 def printBoard(board: list):
     for row in board:
