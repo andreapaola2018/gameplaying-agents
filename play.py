@@ -19,16 +19,17 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
 
         move = monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
         print("FINAL Move selected: ", move.coordinates[1]+1)
-        
-def printTreeMcts(root: MonteCarloNode):
-
-        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
     elif algorithm == "DLMM": 
         # root node with the initial game state
         root = MiniMaxNode(board, 'Y', True, paramValue)
 
         # Evaluate immediate moves and select the final move
         final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
+        
+def printTreeMcts(root: MonteCarloNode):
+
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
+    
                 
 def printTree(root: Node):
 
