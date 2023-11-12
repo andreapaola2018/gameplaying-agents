@@ -1,15 +1,15 @@
-from node import Node
+from mcts_node import MonteCarloNode
 import random
 from PrettyPrint import PrettyPrintTree
 
 def monteCarloTreeSearch(board: list, paramValue: int, nextMovePlayer: str, printMode: str, uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
-    root = Node(board, prevMovePlayer)
+    root = MonteCarloNode(board, prevMovePlayer)
     root.generateChildren(nextMovePlayer)
     
     # Runs for paramValue times
     for _ in range(paramValue):
-        node = selectChildNode(root)
+        node = selectChildNode(root, uct)
         print("selected node: ", node)
         # if the selected node turns out to be a terminal move, we can't roll out any more moves
         # therefore, expand will return a boolean to let us know if we can or cannot expand on that node
@@ -22,16 +22,25 @@ def monteCarloTreeSearch(board: list, paramValue: int, nextMovePlayer: str, prin
         
     # once it is done running simulations, must choose the move with the max mcts value
     # root.printChildrenNodes()
-    printTree(root)
+    if not uct:
+        printTreeMcts(root)
+    else:
+        printTreeMcts(root)
+        print("\n")
+        printTreeUct(root)
     
-    return max(root.children, key=lambda n: n.mctsValueInt())
+    return max(root.children, key=lambda n: n.pureMctsValueInt())
   
 
-def printTree(root: Node):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.mctsValueStr())
+def printTreeMcts(root: MonteCarloNode):
+    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.pureMctsValueStr())
+    pt(root)
+
+def printTreeUct(root: MonteCarloNode):
+    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.uctValueInt(root.numSims))
     pt(root)
     
-def selectChildNode(root: Node) -> Node:
+def selectChildNode(root: MonteCarloNode, uct: bool = False) -> MonteCarloNode:
     selected = root
     while len(selected.children) != 0: # while we have not found a leaf node
         maxSims = max(selected.children, key=lambda n: n.numSims).numSims
@@ -46,9 +55,15 @@ def selectChildNode(root: Node) -> Node:
             return random.choice(unexploredChildren)
             
         # if we reach here, it means all children have been explored, therefore we want to traverse
-        # the child with the highest mcts value to find a leaf node
-        maxChildValue = max(selected.children, key=lambda n: n.mctsValueInt()).mctsValueInt()
-        maxChildren = [n for n in selected.children if n.mctsValueInt() == maxChildValue]
+        # the child with the highest mcts or uct (depending on algorithm) value to find a leaf node
+        maxChildren = []
+        if uct: # we will use uct value
+            rootNumSims = root.numSims
+            maxChildValue = max(selected.children, key=lambda n: n.uctValueInt(rootNumSims)).uctValueInt(rootNumSims)
+            maxChildren = [n for n in selected.children if n.uctValueInt(rootNumSims) == maxChildValue]
+        else: # else pure monte carlo
+            maxChildValue = max(selected.children, key=lambda n: n.pureMctsValueInt()).pureMctsValueInt()
+            maxChildren = [n for n in selected.children if n.pureMctsValueInt() == maxChildValue]
         
         # if there are ties for the highest mcts value, choose one at random
         selected = random.choice(maxChildren)
@@ -57,7 +72,7 @@ def selectChildNode(root: Node) -> Node:
     # found leaf, return
     return selected
 
-def expand(node: Node) -> bool:
+def expand(node: MonteCarloNode) -> bool:
     # first check if selected node to expand on is a winning move
     # if so, cannot expand further, so just return
     gameStatus = node.checkGameStatus()
@@ -75,7 +90,7 @@ def expand(node: Node) -> bool:
     node.generateChildren(flipPlayer(node))
     return True
     
-def rollOut(node: Node):
+def rollOut(node: MonteCarloNode):
     nextMove = node
     
     while True:
@@ -97,7 +112,7 @@ def rollOut(node: Node):
 
     return nextMove # return the leaf node that we end up at
 
-def backPropagate(leaf: Node, nextMovePlayer: str):
+def backPropagate(leaf: MonteCarloNode, nextMovePlayer: str):
     #numSims = 0
     gameOutcome = leaf.checkGameStatus()
     # Since this is a leaf node, the game outcome should be either a win or a draw
@@ -118,5 +133,5 @@ def backPropagate(leaf: Node, nextMovePlayer: str):
         leaf = leaf.parent # go back up
         # numSims += 1
         
-def flipPlayer(node: Node) -> str:
+def flipPlayer(node: MonteCarloNode) -> str:
     return "Y" if node.player == "R" else "R"
