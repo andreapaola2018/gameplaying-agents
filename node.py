@@ -19,10 +19,6 @@ class Node:
                 b += "'" + row[i] + ("', " if i < 6 else "'")
             b += "]\n"
         return b
-    
-    def printChildrenNodes(self):
-        for child in self.children:
-            print(child)
 
     # Generates up to 7 children nodes which represent possible moves for the next player
     def generateChildren(self, nextMovePlayer: str):
@@ -30,7 +26,7 @@ class Node:
             if not self.__isColumnFull(i):
                 coordinates = self.__getCoordinatesForColumn(i)
                 if coordinates: # if column is not full, generate a child
-                    child = Node(self.board, nextMovePlayer, parent=self)
+                    child = Node(self.board, nextMovePlayer, parent=None)
                     child.coordinates = self.__getCoordinatesForColumn(i)
                     self.__generateBoardForChild(child)
                     self.children.append(child)
@@ -53,7 +49,8 @@ class Node:
             left -= 1
         total = rightCount + leftCount + 1
         if total >= 4:
-            return "Win H"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1 
         
         # check vertical
         upCount = 0
@@ -68,7 +65,8 @@ class Node:
             up -= 1
         total = downCount + upCount + 1
         if total >= 4:
-            return "Win V"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1
 
         # check top left to bottom right diagonal
         upLeftCount = 0
@@ -87,7 +85,8 @@ class Node:
             down += 1
         total = upLeftCount + downRightCount + 1
         if total >= 4:
-            return "Win D1"
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1
         
         # check top right to bottom left diagonal
         upRightCount = 0
@@ -108,19 +107,17 @@ class Node:
             down += 1
         total = upRightCount + downLeftCount + 1
         if total >= 4:
-            return "Win D2"
-        
-        # If we get to this point, it means one of 2 things:
-        # (1) The move was a loss, which is true if the board is full now, or
-        # (2) The move is neither a win nor a loss
+            # if Red won -> return -1, if Yellow won -> return 1
+            return -1 if self.player == "R" else 1
         
         # Check if board is full
         for row in self.board:
-            if "O" in row: # Not full, therefore not a loss
-                return "Neither"
+            if "O" in row: # Not full, therefore not a draw
+                # return None, meaning there are still moves left that can be made
+                return None
         
-        # If board was full, then it was a loss
-        return "Loss"
+        # If board was full, then it was a draw since there were no winners
+        return 0
 
     # Will generate a new, updated board for the child, with the tile played by the player in the appropriate coordinates
     def __generateBoardForChild(self, child):
