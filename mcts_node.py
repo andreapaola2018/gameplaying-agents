@@ -53,7 +53,7 @@ class MonteCarloNode:
                     self.children.append(child)
                     
     # Checks the current state of the board to see if the move made is a win, draw, or neither
-    def checkGameStatus(self) -> str:
+    def checkGameStatus(self):
         row = self.coordinates[0]
         col = self.coordinates[1]
         playerTile = self.player
