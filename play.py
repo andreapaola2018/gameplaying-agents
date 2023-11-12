@@ -1,6 +1,6 @@
 # Entry point for our program
 import sys
-from node import Node
+from mcts_node import MonteCarloNode
 from monte_carlo import *
 from PrettyPrint import PrettyPrintTree
 
@@ -38,7 +38,7 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
         monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
         
         
-def printTree(root: Node):
+def printTreeMcts(root: MonteCarloNode):
     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
     pt(root)
 

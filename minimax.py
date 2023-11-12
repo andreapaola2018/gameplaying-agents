@@ -1,10 +1,10 @@
-from node import Node
+from mcts_node import MonteCarloNode
 import math, random
 import copy
 
 def minimax(board, depth, alpha, beta, maximizing_player, nextMovePlayer: str, printMode: str):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
-    root = Node(board, prevMovePlayer)
+    root = MonteCarloNode(board, prevMovePlayer)
     ##generating possible moves 
     root.generateChildren(nextMovePlayer)
 
@@ -12,7 +12,7 @@ def minimax(board, depth, alpha, beta, maximizing_player, nextMovePlayer: str, p
 
 
 
-def minimax_alpha_beta(root: Node, board, depth, alpha, beta, maximizing_player): 
+def minimax_alpha_beta(root: MonteCarloNode, board, depth, alpha, beta, maximizing_player): 
     if depth == 0: 
         return 0 ## return heuristic value 
     

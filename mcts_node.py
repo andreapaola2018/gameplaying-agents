@@ -1,4 +1,8 @@
-class Node:
+import math
+
+EXPLORATION_PARAMETER: int = math.sqrt(2)
+
+class MonteCarloNode:
     def __init__(self, board, player, parent=None):
         self.board: list = board
         self.player = player
@@ -6,10 +10,10 @@ class Node:
         self.wins = 0
         self.numSims = 0
         self.coordinates = [] # to store the coordinates of the current move made
-        self.children: list[Node] = []  # List to store child nodes
+        self.children: list[MonteCarloNode] = []  # List to store child nodes
         
     def __str__(self):
-        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + " MCTS value: " + str(self.mctsValueInt()) + "\n" + self.__boardFormatted()
+        return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + " MCTS value: " + str(self.pureMctsValueInt()) + "\n" + self.__boardFormatted()
     
     def __boardFormatted(self) -> str:
         if self.board is None:
@@ -26,11 +30,16 @@ class Node:
         for child in self.children:
             print(child)
             
-    def mctsValueStr(self):
+    def pureMctsValueStr(self) -> str:
         return str(self.wins) + "/" + str(self.numSims)
     
-    def mctsValueInt(self) -> int:
+    def pureMctsValueInt(self) -> int:
         return 0 if self.numSims == 0 else self.wins/self.numSims
+    
+    def uctValueInt(self, rootNumSims):
+        if self.numSims == 0:
+            return self.pureMctsValueStr()
+        return (self.wins / self.numSims) + (EXPLORATION_PARAMETER * math.sqrt(math.log(rootNumSims) / self.numSims))
 
     # Generates up to 7 children nodes which represent possible moves for the next player
     def generateChildren(self, nextMovePlayer: str):
@@ -38,7 +47,7 @@ class Node:
             if not self.__isColumnFull(i):
                 coordinates = self.__getCoordinatesForColumn(i)
                 if coordinates: # if column is not full, generate a child
-                    child = Node(self.board, nextMovePlayer, parent=self)
+                    child = MonteCarloNode(self.board, nextMovePlayer, parent=self)
                     child.coordinates = self.__getCoordinatesForColumn(i)
                     self.__generateBoardForChild(child)
                     self.children.append(child)
