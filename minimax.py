@@ -1,6 +1,6 @@
 import math, random
 
-class Node:
+class MiniMaxNode:
     def __init__(self, board, player, maximizingPlayer, depth, parent=None):
         self.board: list = board
         self.player = player
@@ -8,7 +8,7 @@ class Node:
         self.depth = depth
         self.maximizingPlayer = maximizingPlayer
         self.coordinates = [] # to store the coordinates of the current move made
-        self.children: list[Node] = []  # List to store child nodes
+        self.children: list[MiniMaxNode] = []  # List to store child nodes
         
     def __str__(self):
         return "Coordinates: " + ((str(self.coordinates[0]) + " " + str(self.coordinates[1])) if (len(self.coordinates) == 2) else "") + "\n" + self.__boardFormatted()
@@ -30,7 +30,7 @@ class Node:
             if not self.__isColumnFull(i):
                 coordinates = self.__getCoordinatesForColumn(i)
                 if coordinates: # if column is not full, generate a child
-                    child = Node(self.board, nextMovePlayer, maximizingPlayer, depth, parent=None)
+                    child = MiniMaxNode(self.board, nextMovePlayer, maximizingPlayer, depth, parent=None)
                     child.coordinates = self.__getCoordinatesForColumn(i)
                     self.__generateBoardForChild(child)
                     self.children.append(child)
