@@ -3,6 +3,8 @@ import sys
 from uniform_random import *
 from minimax import *
 from node import Node
+from mcts_node import MonteCarloNode
+from monte_carlo import *
 from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
@@ -11,8 +13,7 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
     if algorithm == "UR":
         uniform_random(board, nextMovePlayer, printMode)
     elif algorithm == "PMCGS":
-        pass
-        # monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
         # root = Node(board, "Y" if nextMovePlayer == "R" else "R")
         # root.generateChildren(nextMovePlayer)
         # print("Root's children:")
@@ -38,7 +39,7 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
         
         # printTree(root)
     elif algorithm == "UCT":
-        pass
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
     elif algorithm == "DLMM": 
         # root node with the initial game state
         root = MiniMaxNode(board, 'Y', True, paramValue)
@@ -63,8 +64,6 @@ def readFromFile(fileName: str) -> (list, str, int, str):
     with open(fileName, 'r') as f:
         algorithm = f.readline().strip()  # algorithm name
         param_value = int(f.readline().strip()) # parameter value
-        algorithm = f.readline().strip()  # algorithm name
-        param_value = int(f.readline().strip()) # parameter value
         next_move_player = f.readline().strip()  # player who will make the next move
 
         # reading through all the map coordinates and saving as a 2D list
@@ -82,10 +81,6 @@ def main():
     board, algorithm, param_value, next_move_player = readFromFile(fileName)
     
     play(board, algorithm, param_value, next_move_player, printMode)
-    
-    play(board, algorithm, param_value, next_move_player, printMode)
-
-
 
 if __name__ == "__main__":
     main()

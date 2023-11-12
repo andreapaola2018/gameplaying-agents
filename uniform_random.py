@@ -20,4 +20,3 @@ def generate_random_child(root: Node) -> Node:
     random_child = random.choice(legal_moves)
     
     return random_child
-
