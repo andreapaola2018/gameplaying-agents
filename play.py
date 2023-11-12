@@ -1,21 +1,37 @@
 # Entry point for our program
 import sys
+from uniform_random import *
+from minimax import *
+from node import Node
 from mcts_node import MonteCarloNode
 from monte_carlo import *
 from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
 def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
+    print(algorithm)
     if algorithm == "UR":
-        pass
+        uniform_random(board, nextMovePlayer, printMode)
     elif algorithm == "PMCGS":
         move = monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
         print("FINAL Move selected: ", move.coordinates[1]+1)
     elif algorithm == "UCT":
+
         move = monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
         print("FINAL Move selected: ", move.coordinates[1]+1)
         
 def printTreeMcts(root: MonteCarloNode):
+
+        monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
+    elif algorithm == "DLMM": 
+        # root node with the initial game state
+        root = MiniMaxNode(board, 'Y', True, paramValue)
+
+        # Evaluate immediate moves and select the final move
+        final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
+                
+def printTree(root: Node):
+
     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
     pt(root)
 
