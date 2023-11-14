@@ -1,23 +1,24 @@
 # Entry point for our program
 import sys
+from gameState import gameState
 from uniform_random import *
 from minimax import *
 from node import Node
-from mcts_node import MonteCarloNode
 from monte_carlo import *
-# from PrettyPrint import PrettyPrintTree
+from mcts_node import *
+from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
-def play(board, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
+def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
+    print(algorithm)
     if algorithm == "UR":
-        uniform_random(board, nextMovePlayer, printMode)
-    # elif algorithm == "PMCGS":
-    #     move = monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode)
-    #     print("FINAL Move selected: ", move.coordinates[1]+1)
-    # elif algorithm == "UCT":
-
-    #     move = monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
-    #     print("FINAL Move selected: ", move.coordinates[1]+1)
+        uniform_random(game, nextMovePlayer, printMode)
+    elif algorithm == "PMCGS":
+        move = monteCarloTreeSearch(game, paramValue, nextMovePlayer, printMode)
+        print("FINAL Move selected: ", move.coordinates[1]+1)
+    elif algorithm == "UCT":
+        move = monteCarloTreeSearch(game, paramValue, nextMovePlayer, printMode, True)
+        print("FINAL Move selected: ", move.coordinates[1]+1)
     elif algorithm == "DLMM": 
         print("****Depth-Limited Minimax with Alpha-Beta Pruning****")
         DLMM(board, paramValue, nextMovePlayer, True)
@@ -36,6 +37,15 @@ def play(board, algorithm: str, paramValue: int, nextMovePlayer: str, printMode:
 
 #     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
 #     pt(root)
+        # root node with the initial game state
+        root = MiniMaxNode(game, 'Y', True, paramValue)
+
+        # Evaluate immediate moves and select the final move
+        final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
+        
+def printTree(root: Node):
+    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
+    pt(root)
 
 def printBoard(board: list):
     for row in board:
@@ -61,13 +71,14 @@ def readFromFile(fileName: str) -> (list, str, int, str):
 
 # main method
 def main():
+    # PART 1: Please comment this section out in order to run PART 2
     fileName = sys.argv[1]
     printMode = sys.argv[2]
     
-    board, algorithm, param_value, next_move_player = readFromFile(fileName)
+    board, algorithm, paramValue, nextMovePlayer = readFromFile(fileName)
+    game = gameState(board)
     
-    play(board, algorithm, param_value, next_move_player, printMode.lower())
-
+    play(game, algorithm, paramValue, nextMovePlayer, printMode.lower())
 
 if __name__ == "__main__":
     main()
