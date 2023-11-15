@@ -1,9 +1,12 @@
+# Part 2 - Testing the algorithms against each other
 from uniform_random import *
 from minimax import *
 from monte_carlo import *
+from gameState import gameState
 
 def main():
     statistics = getCombinations()
+
     for item in statistics:
         print(item)
     
@@ -15,22 +18,15 @@ def main():
         param2 = item[6]
         player2= item[7]
         
-        winAlgo, winPlayer = playGame(algo1=algo1, param1=param1, player1=player1, algo2=algo2, param2=param2, player2=player2)
-        print(winAlgo)
-        print(winPlayer)
+        gameOutcome = playGame(algo1=algo1, param1=param1, player1=player1, algo2=algo2, param2=param2, player2=player2)
+        print(gameOutcome)
         
-        if winAlgo == "Draw":
+        if gameOutcome == 0: # draw
             item[9] += 1
-        elif algo1 == algo2:
-            if winPlayer == player1:
-                item[4] += 1
-            else:
-                item[8] += 1
-        else:
-            if winAlgo == algo1:
-                item[4] += 1
-            else:
-                item[8] += 1
+        elif gameOutcome == -1: # red won
+            item[4] += 1
+        else: # yellow won
+            item[8] += 1
         
         print(item)
         break
@@ -54,50 +50,76 @@ def getCombinations():
 
 
 def playGame(algo1, param1, player1, algo2, param2,  player2) -> str:
-    board = [["O"]*7]*6
+    board = getEmptyBoard()
+    game = gameState(board)
     printMode = "none"
-    gameStatus = None
 
-    while gameStatus is None:
+    while game.gameOutcome is None:
         # Algorithm 1's turn
         if "PMCGS" in algo1:
-            move = monteCarloTreeSearch(board, param1, player1, printMode)
-            board = move.board
-            gameStatus = move.checkGameStatus()
-            if gameStatus == 0:  # draw
-                return "Draw", None
-            if wasWinningMove(gameStatus, player1):
-                return algo1, player1
+            move = monteCarloTreeSearch(game, param1, player1, printMode)
+            print("Before reset:")
+            game.printBoard()
+            game.resetToOriginalState()
+            print("After reset:")
+            game.printBoard()
+            
+            game.checkGameStatus(move.coordinates, player1)
+            if game.gameOutcome == -1:
+                print("Winning move: ", move.coordinates)
+            # if game.gameOutcome == 0:  # draw
+            #     return "Draw", None
+            # if wasWinningMove(game.gameOutcome, player1):
+            #     return algo1, player1
 
         elif "UCT" in algo1:
-            move = monteCarloTreeSearch(board, param1, player1, printMode, True)
-            board = move.board
-            gameStatus = move.checkGameStatus()
-            if gameStatus == 0:  # draw
-                return "Draw", None
-            if wasWinningMove(gameStatus, player1):
-                return algo1, player1
+            move = monteCarloTreeSearch(game, param1, player1, printMode, True)
+            # if game.gameOutcome == 0:  # draw
+            #     return "Draw", None
+            # if wasWinningMove(game.gameOutcome, player1):
+            #     return algo1, player1
 
+        if game.gameOutcome is not None:
+            return game.gameOutcome
         
         # Algorithm 2's turn
         if "PMCGS" in algo2:
-            move = monteCarloTreeSearch(board, param2, player2, printMode)
-            board = move.board
-            gameStatus = move.checkGameStatus()
-            if gameStatus == 0:  # draw
-                return "Draw", None
-            if wasWinningMove(gameStatus, player2):
-                return algo2, player2
+            move = monteCarloTreeSearch(game, param2, player2, printMode)
+            print("Before reset:")
+            game.printBoard()
+            game.resetToOriginalState()
+            print("After reset:")
+            game.printBoard()
+            game.checkGameStatus(move.coordinates, player2)
+            if game.gameOutcome == 1:
+                print("Winning move: ", move.coordinates)
+            # if game.gameOutcome == 0:  # draw
+            #     return "Draw", None
+            # if wasWinningMove(gameStatus, player2):
+            #     return algo2, player2
 
         elif "UCT" in algo2:
-            move = monteCarloTreeSearch(board, param2, player2, printMode, True)
-            board = move.board
-            gameStatus = move.checkGameStatus()
-            if gameStatus == 0:  # draw
-                return "Draw", None
-            if wasWinningMove(gameStatus, player2):
-                return algo2, player2
+            move = monteCarloTreeSearch(game, param2, player2, printMode, True)
+            # if gameStatus == 0:  # draw
+            #     return "Draw", None
+            # if wasWinningMove(gameStatus, player2):
+            #     return algo2, player2
+        
+    
+    return game.gameOutcome
 
+def getEmptyBoard():
+    fileName = "emptyBoard.txt"
+    board = []
+
+   # reading the file
+    with open(fileName, 'r') as f:
+        # reading through all the map coordinates and saving as a 2D list
+        for _, line in enumerate(f):
+            letters = [l for l in line.strip()]
+            board.append(letters)
+
+    return board
 
 def wasWinningMove(gameStatus, nextMovePlayer) -> bool:
     if (gameStatus == -1 and nextMovePlayer == "R") or (gameStatus == 1 and nextMovePlayer == "Y"):

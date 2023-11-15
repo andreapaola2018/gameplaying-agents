@@ -42,7 +42,10 @@ class MonteCarloNode:
     # Given the player and the game state, generates up to 7 children nodes which represent all the legal possible moves for the player
     def generateChildren(self, nextMovePlayer: str, gameState: gameState):
         legalMoves = gameState.getLegalMoves()
-        for move in legalMoves:
-            child = MonteCarloNode(nextMovePlayer, move, self)
-            self.children.append(child)
+        if legalMoves:
+            for move in legalMoves:
+                if move == []:
+                    print("Got an empty move!")
+                child = MonteCarloNode(nextMovePlayer, move, self)
+                self.children.append(child)
                     
