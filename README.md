@@ -61,4 +61,8 @@ Depth-Limited Minimax with Alpha-Beta Pruning optimizes the minimax algorithm by
 
 ### Playing Against a Human Player
 
-TODO
+A human player can play against a specified algorithm. Accepted algorithms to choose from are `DLMM`, `PMCGS`, and `UCT`.
+
+In order to run this feature, run the following:
+
+`python3 humanPlay.py <name of algorithm>`

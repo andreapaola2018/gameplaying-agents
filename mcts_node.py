@@ -25,7 +25,6 @@ class MonteCarloNode:
         for child in self.children:
             print(child.coordinates)
         
-    # TO DELETE    
     def pureMctsValueStr(self) -> str:
         return str(self.wins) + "/" + str(self.numSims)
     
