@@ -25,11 +25,11 @@ Game search algorithms supported are: Uniform Random (UR), Depth-Limited MinMax 
 
 ### Uniform Random (UR)
 
-TODO
+The Uniform Random algorithm chooses a node or in this case a move in Connect 4, at random. This algorithm selects a legal move and each legal move is selected with the same probability. 
 
 ### Depth-Limited MinMax (DLMM)
 
-TODO
+Depth-Limited MinMax uses depth-first minimax search to a certain depth to select a next move. At the the nodes at the specified depth limit or the leaf nodes, a heuristic evaluation function is used to estimate value of the game state. The values calculated are then back propagated to the root of the tree. At each level of the tree the algorithm chooses the maximum or minimum value, depending on whether it is the player's or the opponent's turn. This continues until the root node is reached.
 
 ### Pure Monte Carlo Game Search (PMCGS)
 
@@ -57,7 +57,7 @@ The final move selection is not based on the UCB value, but on the direct estima
 
 ### Alpha-Beta Pruning in Depth-Limited MinMax
 
-TODO
+Depth-Limited Minimax with Alpha-Beta Pruning optimizes the minimax algorithm by evaluating a smaller number of nodes in a search tree through pruning. Alpha beta pruning allows for the pruning of branches in the tree that will not affect the final outcome of the game. This significantly improves the performance of the algorithm by reducing the number of nodes that need to be evaluated. 
 
 ### Playing Against a Human Player
 

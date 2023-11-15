@@ -7,6 +7,7 @@ from node import Node
 from monte_carlo import *
 from mcts_node import *
 
+
 # This method starts the game play
 def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
     print(algorithm)

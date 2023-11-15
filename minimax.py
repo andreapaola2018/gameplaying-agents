@@ -1,6 +1,7 @@
 import math
 import random
 from gameState import gameState
+import time
 class MiniMaxNode:
     def __init__(self, board, player, maximizingPlayer, depth, parent=None):
         self.board: list = board
@@ -245,8 +246,10 @@ class MiniMaxNode:
         total_score = player_score - opponent_score
         max_possible_score = 2 * (self.count_lines_of_length(3, "R") +
              self.count_lines_of_length(3, "Y"))
-        heuristic_value = (
-            total_score / max_possible_score) if max_possible_score != 0 else 0
+        if max_possible_score != 0: 
+            heuristic_value = total_score / max_possible_score
+        else:
+            heuristic_value = 0
         return heuristic_value
 
     def count_lines_of_length(self, length, player):
@@ -299,21 +302,24 @@ def DLMM(board, depth, nextMovePlayer, isAlphaBeta):
 
     # Run Minimax algorithm with a specified depth
     if isAlphaBeta: 
-
+        start_time = time.time()
         result, selected_move = root_node.minimax_alpha_beta(depth, -math.inf, math.inf)
+        elapsed_time = time.time() - start_time
+        # print(f"Total Elapsed Time with Alpha-Beta Pruning: {elapsed_time} seconds")
     else: 
+        start_time = time.time()
         result, selected_move = root_node.minimax(depth)
+        elapsed_time = time.time() - start_time
+        # print(f"Total Elapsed Time without Pruning: {elapsed_time} seconds")
 
     
-    # if selected_move == None: 
-    #     print("No valid moves")
+    if selected_move == None: 
+        print("No valid moves")
 
-    # print("Minimax result:", result)
+    print("Output: ")
+    root_node.output()
 
-    # print("Output: ")
-    # root_node.output()
-
-    # print("FINAL Move selected: ", selected_move[1]+1)
+    print("FINAL Move selected: ", selected_move[1]+1)
     root_node.board[selected_move[0]][selected_move[1]] = nextMovePlayer 
 
     return result, selected_move, root_node.board

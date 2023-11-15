@@ -59,12 +59,13 @@ def playGame(algo1, param1, player1, algo2, param2,  player2) -> str:
             if gameOutcome is not None:
                 return gameOutcome
         elif algo1 == "DLMM":
-            _, move, board = DLMM(board, param1, player1, True)
-            node = MiniMaxNode(board, player1, True, 5)
-            node.coordinates = move
-            gameOutcome = node.checkGameStatus()
-            if gameOutcome is not None:
-                return gameOutcome
+            pass
+            # _, move, board = DLMM(board, param1, player1, True)
+            # node = MiniMaxNode(board, player1, True, 5)
+            # node.coordinates = move
+            # gameOutcome = node.checkGameStatus()
+            # if gameOutcome is not None:
+            #     return gameOutcome
             
         elif "PMCGS" in algo1:
             move = monteCarloTreeSearch(game, param1, player1, printMode)
@@ -87,12 +88,13 @@ def playGame(algo1, param1, player1, algo2, param2,  player2) -> str:
            if gameOutcome is not None:
                 return gameOutcome
         elif algo2 == "DLMM":
-            _, move, board = DLMM(board, param2, player2, True)
-            node = MiniMaxNode(board, player2, True, 5)
-            node.coordinates = move
-            gameOutcome = node.checkGameStatus()
-            if gameOutcome is not None:
-                return gameOutcome
+            pass
+            # _, move, board = DLMM(board, param2, player2, True)
+            # node = MiniMaxNode(board, player2, True, 5)
+            # node.coordinates = move
+            # gameOutcome = node.checkGameStatus()
+            # if gameOutcome is not None:
+            #     return gameOutcome
         elif "PMCGS" in algo2:
             move = monteCarloTreeSearch(game, param2, player2, printMode)
             game.resetToOriginalState()
