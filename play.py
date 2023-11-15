@@ -6,13 +6,12 @@ from minimax import *
 from node import Node
 from monte_carlo import *
 from mcts_node import *
-from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
 def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
     print(algorithm)
     if algorithm == "UR":
-        uniform_random(game, nextMovePlayer, printMode)
+        uniform_random(game.simBoard, nextMovePlayer, printMode)
     elif algorithm == "PMCGS":
         move = monteCarloTreeSearch(game, paramValue, nextMovePlayer, printMode)
         print("FINAL Move selected: ", move.coordinates[1]+1)
@@ -21,35 +20,10 @@ def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, 
         print("FINAL Move selected: ", move.coordinates[1]+1)
     elif algorithm == "DLMM": 
         print("****Depth-Limited Minimax with Alpha-Beta Pruning****")
-        DLMM(board, paramValue, nextMovePlayer, True)
+        DLMM(game.simBoard, paramValue, nextMovePlayer, True)
 
         print("\n****Depth-Limited Minimax****")
-        DLMM(board, paramValue, nextMovePlayer, False)
-
-
-        
-# def printTreeMcts(root: MonteCarloNode):
-
-#         monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
-    
-                
-# def printTree(root: Node):
-
-#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
-#     pt(root)
-        # root node with the initial game state
-        root = MiniMaxNode(game, 'Y', True, paramValue)
-
-        # Evaluate immediate moves and select the final move
-        final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
-        
-def printTree(root: Node):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
-    pt(root)
-
-def printBoard(board: list):
-    for row in board:
-        print(row)
+        DLMM(game.simBoard, paramValue, nextMovePlayer, False)
 
 def readFromFile(fileName: str) -> (list, str, int, str):
     algorithm = ""

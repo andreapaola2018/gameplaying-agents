@@ -78,15 +78,6 @@ def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: 
     
     gameState.makeMove(move.coordinates, move.player)
     return move
-
-# These 2 methods should be removed before submitting
-def printTreeMcts(root: MonteCarloNode):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.pureMctsValueStr())
-    pt(root)
-
-# def printTreeUct(root: MonteCarloNode):
-#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.uctValueInt(root.numSims))
-#     pt(root)
     
 # Given a root and a game state, will select a child node at random (if pure monte carlo) or by using uct
 def selectChildNode(root: MonteCarloNode, gameState: gameState, uct: bool = False) -> MonteCarloNode:

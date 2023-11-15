@@ -173,22 +173,22 @@ class MiniMaxNode:
 
         if self.maximizingPlayer:
             max_eval = float('-inf')
-            selected_move = None
+            selected_move = []
             for child in self.children:
                 eval, _ = child.minimax(depth - 1)
                 if eval > max_eval:
                     max_eval = eval
-                    selected_move = child.coordinates[1]
-            return max_eval, selected_move + 1 if selected_move is not None else None
+                    selected_move = child.coordinates
+            return max_eval, selected_move if selected_move is not None else None
         else:
             min_eval = float('inf')
-            selected_move = None
+            selected_move = []
             for child in self.children:
                 eval, _ = child.minimax(depth - 1)
                 if eval < min_eval:
                     min_eval = eval
-                    selected_move = child.coordinates[1]
-            return min_eval, selected_move + 1 if selected_move is not None else None
+                    selected_move = child.coordinates
+            return min_eval, selected_move if selected_move is not None else None
 
     def minimax_alpha_beta(self, depth, alpha, beta):   
         game_result = self.checkGameStatus()
@@ -202,28 +202,28 @@ class MiniMaxNode:
 
         if self.maximizingPlayer:
             max_eval = float('-inf')
-            selected_move = None 
+            selected_move = []
             for child in self.children:
                 eval, _ = child.minimax_alpha_beta(depth - 1, alpha, beta)
                 if eval > max_eval: 
                     max_eval = eval
-                    selected_move = child.coordinates[1]
+                    selected_move = child.coordinates
                 alpha = max(alpha, eval)
                 if beta <= alpha:
                     break
-            return max_eval, selected_move + 1 if selected_move is not None else None
+            return max_eval, selected_move if selected_move is not None else None
         else:
             min_eval = float('inf')
-            selected_move = None
+            selected_move = []
             for child in self.children:
                 eval, _ = child.minimax_alpha_beta(depth - 1, alpha, beta)
                 if eval < min_eval: 
                     min_eval = eval
-                    selected_move = child.coordinates[1]
+                    selected_move = child.coordinates
                 beta = min(beta, eval)
                 if beta <= alpha:
                     break
-            return min_eval, selected_move + 1 if selected_move is not None else None
+            return min_eval, selected_move if selected_move is not None else None
 
     def heuristic_evaluation(self):
         player = self.player
@@ -304,15 +304,16 @@ def DLMM(board, depth, nextMovePlayer, isAlphaBeta):
     else: 
         result, selected_move = root_node.minimax(depth)
 
+    
+    # if selected_move == None: 
+    #     print("No valid moves")
 
-    if selected_move == None: 
-        print("No valid moves")
+    # print("Minimax result:", result)
 
-    print("Minimax result:", result)
+    # print("Output: ")
+    # root_node.output()
 
-    print("Output: ")
-    root_node.output()
+    # print("FINAL Move selected: ", selected_move[1]+1)
+    root_node.board[selected_move[0]][selected_move[1]] = nextMovePlayer 
 
-    print("FINAL Move selected: ", selected_move)
-
-    return result, selected_move
+    return result, selected_move, root_node.board
