@@ -179,11 +179,6 @@ def rollOut(node: MonteCarloNode, printMode: str, gameState: gameState):
             print("NODE ADDED\n")
         
         if len(nextMove.children) == 0: # If we could not generate more children, it means a terminal state was reached
-            # Note: This if statement is here as a precaution, given the if statement above, this should never happen
-            print("Children empty, game status: ", gameStatus)
-            print("current child: ", nextMove)
-            print("Board:")
-            gameState.printBoard()
             break
 
     return nextMove # return the leaf node that we end up at and the game outcome
@@ -195,10 +190,6 @@ def backPropagate(leaf: MonteCarloNode, printMode: str, gameState: gameState):
     # Since this is a leaf node, the game outcome should be either a win or a draw
     # if this is not the case, clearly there was an error somewhere
     if gameState.gameOutcome is None: # this is here as a precaution and should never happen
-        print("Error in leaf node")
-        print("Leaf that has error: ", leaf)
-        print("Board")
-        gameState.printBoard()
         return
     
     # While we have not reached the root node we back propagate
