@@ -1,3 +1,4 @@
+import copy
 # A class that represents the current state of the game
 class gameState:
     simBoard: list # This is the board that will be used to simulate game play
@@ -8,8 +9,8 @@ class gameState:
     isDraw: bool = False
     
     def __init__(self, board) -> None:
-        self.simBoard = board
         self.originalBoard = board
+        self.simBoard = copy.deepcopy(board)
     
     # Returns a list of coordinates of all legal moves possible in the board
     def getLegalMoves(self):
@@ -22,14 +23,23 @@ class gameState:
                         legalMoves.append([rowIndex, colIndex])
                         break
         
+        if legalMoves == []:
+            return None
         return legalMoves
     
-    # Given move coordinates and a player, makes a move for that player.
+    # Given move coordinates and a player, makes a move for that player on the simulation board.
+    # Caution: expects a legal move, will mess up game play if given an illegal move!
+    def makeSimMove(self, moveCoordinates, player):
+        row = moveCoordinates[0]
+        col = moveCoordinates[1]
+        self.simBoard[row][col] = player
+     
+    # Given move coordinates and a player, makes a move for that player on the actual game board.
     # Caution: expects a legal move, will mess up game play if given an illegal move!
     def makeMove(self, moveCoordinates, player):
         row = moveCoordinates[0]
         col = moveCoordinates[1]
-        self.simBoard[row][col] = player
+        self.originalBoard[row][col] = player
         
     # Helper method to print out the board in a nice, readable format
     def printBoard(self):
@@ -45,7 +55,7 @@ class gameState:
         
     # This method resets the current game state to its original state before simulating game play to the end
     def resetToOriginalState(self):
-        self.simBoard = self.originalBoard
+        self.simBoard = copy.deepcopy(self.originalBoard)
         self.isWin = self.isDraw = False
         self.gameOutcome = None
     
