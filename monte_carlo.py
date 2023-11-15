@@ -1,6 +1,6 @@
 from mcts_node import MonteCarloNode
 import random
-from PrettyPrint import PrettyPrintTree
+# from PrettyPrint import PrettyPrintTree
 
 def monteCarloTreeSearch(board: list, paramValue: int, nextMovePlayer: str, printMode: str = "None", uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
@@ -63,13 +63,13 @@ def monteCarloTreeSearch(board: list, paramValue: int, nextMovePlayer: str, prin
     # else it is yellow's turn, so we want to maximize
     return max(root.children, key=lambda n: n.pureMctsValueInt())
 
-def printTreeMcts(root: MonteCarloNode):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.pureMctsValueStr())
-    pt(root)
+# def printTreeMcts(root: MonteCarloNode):
+#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.pureMctsValueStr())
+#     pt(root)
 
-def printTreeUct(root: MonteCarloNode):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.uctValueInt(root.numSims))
-    pt(root)
+# def printTreeUct(root: MonteCarloNode):
+#     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.uctValueInt(root.numSims))
+#     pt(root)
     
 
 def selectChildNode(root: MonteCarloNode, uct: bool = False) -> MonteCarloNode:
