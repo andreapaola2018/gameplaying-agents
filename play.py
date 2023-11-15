@@ -6,6 +6,8 @@ from minimax import *
 from node import Node
 from monte_carlo import *
 from mcts_node import *
+from PrettyPrint import PrettyPrintTree
+
 
 # This method starts the game play
 def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
