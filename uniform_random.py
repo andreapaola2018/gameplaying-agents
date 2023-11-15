@@ -5,7 +5,6 @@ def uniform_random(board: list, nextMovePlayer: str, printMode: str):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
     root = Node(board, prevMovePlayer)
     root.generateChildren(nextMovePlayer)
-    
     node = generate_random_child(root)
     # print("Move Selected", node)
     return node
