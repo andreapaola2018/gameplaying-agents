@@ -28,8 +28,8 @@ def main():
         print(item)
 
 def getCombinations():
-    algorithms = [["UR", 0], ["DLMM", 5], ["PMCGS500", 500], ["PMCGS1000", 1000], ["UCT500", 500], ["UCT1000", 1000]]
-    # algorithms = [["PMCGS500", 500], ["PMCGS10000", 1000], ["UCT500", 500], ["UCT10000", 1000]]
+    #algorithms = [["UR", 0], ["DLMM", 5], ["PMCGS500", 500], ["PMCGS1000", 1000], ["UCT500", 500], ["UCT1000", 1000]]
+    algorithms = [["UR", 0], ["PMCGS500", 500], ["PMCGS10000", 1000], ["UCT500", 500], ["UCT10000", 1000]]
     statistics = []
     # make all 36 combinations of algorithms that we want to test
     for i in range(len(algorithms)):

@@ -1,7 +1,6 @@
 from gameState import gameState
 from mcts_node import MonteCarloNode
 import random
-# from PrettyPrint import PrettyPrintTree
 
 def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: str, printMode: str = "None", uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
@@ -46,16 +45,8 @@ def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: 
                 
             backPropagate(node, printMode, gameState)
             
-        gameState.resetToOriginalState() # resetting the board for the next simulation
-        # gameState.printBoard()
-        
-    # if not uct:
-    #     printTreeMcts(root)
-    # else:
-    #     printTreeMcts(root)
-    #     print("\n")
-    #     printTreeUct(root)
-    
+        gameState.resetToOriginalState() # resetting the board for the next simulation        
+
     if printMode == "brief" or printMode == "verbose":
         columns = [n.coordinates[1]+1 for n in root.children]
         c = 0
@@ -78,15 +69,6 @@ def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: 
     
     gameState.makeMove(move.coordinates, move.player)
     return move
-
-# These 2 methods should be removed before submitting
-def printTreeMcts(root: MonteCarloNode):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.pureMctsValueStr())
-    pt(root)
-
-def printTreeUct(root: MonteCarloNode):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.uctValueInt(root.numSims))
-    pt(root)
 
 # Given a root and a game state, will select a child node at random (if pure monte carlo) or by using uct
 def selectChildNode(root: MonteCarloNode, gameState: gameState, uct: bool = False) -> MonteCarloNode:
