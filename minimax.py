@@ -25,7 +25,7 @@ class MiniMaxNode:
             b += "]\n"
         return b
 
-    # Generates up to 7 children nodes which represent possible moves for the next player
+    #Generates up to 7 children nodes which represent possible moves for the next player
     def generateChildren(self, nextMovePlayer: str, maximizingPlayer, depth):
         for i in range(7):  # check all 7 columns in board
             if not self.__isColumnFull(i):
@@ -41,7 +41,7 @@ class MiniMaxNode:
                     if depth > 1:  # Considering the depth limit
                         child.generateChildren(
                             "R" if nextMovePlayer == "Y" else "Y", maximizingPlayer_for_opponent, depth - 1)
-                        
+                            
     # Checks the current state of the board to see if the move made is a win, loss, or neither move
     def checkGameStatus(self) -> str:
 
@@ -162,9 +162,8 @@ class MiniMaxNode:
             return False
         return True
 
-    def minimax(self, depth, maximizing_player):
+    def minimax(self, depth):
         game_result = self.checkGameStatus()
-
         if depth == 0 or game_result is not None:
             # game is not over
             if game_result is None:
@@ -186,8 +185,8 @@ class MiniMaxNode:
             selected_move = None
             for child in self.children:
                 eval, _ = child.minimax(depth - 1)
-                if eval[0] < min_eval:
-                    min_eval = eval[0]
+                if eval < min_eval:
+                    min_eval = eval
                     selected_move = child.coordinates[1]
             return min_eval, selected_move + 1 if selected_move is not None else None
 
@@ -244,8 +243,7 @@ class MiniMaxNode:
 
         # Normalize scores and return a value between -1 and 1
         total_score = player_score - opponent_score
-        max_possible_score = 2 * \
-            (self.count_lines_of_length(3, "R") +
+        max_possible_score = 2 * (self.count_lines_of_length(3, "R") +
              self.count_lines_of_length(3, "Y"))
         heuristic_value = (
             total_score / max_possible_score) if max_possible_score != 0 else 0
@@ -282,7 +280,6 @@ class MiniMaxNode:
                 line = [self.board[row + i][col - i] for i in range(length)]
                 if all(tile == player for tile in line):
                     lines += 1
-
         return lines
     
     
@@ -292,36 +289,7 @@ class MiniMaxNode:
             eval = child.heuristic_evaluation()
             print(f"Column {child.coordinates[1] + 1}: {eval}" if eval is not None else f"Column {child.coordinates[1] + 1}: Null")
 
-
-
-
-sample_board = [
-    ['O', 'O', 'O', 'O', 'O', 'O', 'O'],
-    ['O', 'O', 'O', 'O', 'O', 'O', 'O'],
-    ['O', 'O', 'O', 'O', 'O', 'Y', 'O'],
-    ['O', 'O', 'R', 'Y', 'O', 'O', 'Y'],
-    ['O', 'Y', 'R', 'Y', 'O', 'Y', 'R'],
-    ['Y', 'R', 'R', 'Y', 'R', 'R', 'R']
-]
-
-##DLMM with alpha-beta pruning 
-# root_node = MiniMaxNode(sample_board, player="R",
-#                 maximizingPlayer=True, depth=5)
-
-# # Generate children nodes (possible moves)
-# root_node.generateChildren("Y", True, 5)
-
-# # Run Minimax algorithm with a specified depth
-# result, selected_move = root_node.minimax_alpha_beta(5, -math.inf, math.inf)
-# if selected_move == None: 
-#     print("No valid moves")
-# print("Minimax result:", result)
-# print("Output: ")
-# root_node.output()
-# print("FINAL Move selected: ", selected_move)
-        
-
-def DLMM(board, depth, nextMovePlayer): 
+def DLMM(board, depth, nextMovePlayer, isAlphaBeta): 
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
 
     root_node = MiniMaxNode(board, prevMovePlayer, True, depth)
@@ -330,7 +298,12 @@ def DLMM(board, depth, nextMovePlayer):
     root_node.generateChildren(nextMovePlayer, not root_node.maximizingPlayer, depth)
 
     # Run Minimax algorithm with a specified depth
-    result, selected_move = root_node.minimax_alpha_beta(depth, -math.inf, math.inf)
+    if isAlphaBeta: 
+
+        result, selected_move = root_node.minimax_alpha_beta(depth, -math.inf, math.inf)
+    else: 
+        result, selected_move = root_node.minimax(depth)
+
 
     if selected_move == None: 
         print("No valid moves")
@@ -342,4 +315,4 @@ def DLMM(board, depth, nextMovePlayer):
 
     print("FINAL Move selected: ", selected_move)
 
-# DLMM(initial_board, 5, "R")
+    return result, selected_move

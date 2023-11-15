@@ -8,8 +8,7 @@ from monte_carlo import *
 # from PrettyPrint import PrettyPrintTree
 
 # This method starts the game play
-def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
-    print(algorithm)
+def play(board, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
     if algorithm == "UR":
         uniform_random(board, nextMovePlayer, printMode)
     # elif algorithm == "PMCGS":
@@ -20,7 +19,13 @@ def play(board: list, algorithm: str, paramValue: int, nextMovePlayer: str, prin
     #     move = monteCarloTreeSearch(board, paramValue, nextMovePlayer, printMode, True)
     #     print("FINAL Move selected: ", move.coordinates[1]+1)
     elif algorithm == "DLMM": 
-        DLMM(board, paramValue, nextMovePlayer)
+        print("****Depth-Limited Minimax with Alpha-Beta Pruning****")
+        DLMM(board, paramValue, nextMovePlayer, True)
+
+        print("\n****Depth-Limited Minimax****")
+        DLMM(board, paramValue, nextMovePlayer, False)
+
+
         
 # def printTreeMcts(root: MonteCarloNode):
 
