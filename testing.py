@@ -48,42 +48,62 @@ def playGame(algo1, param1, player1, algo2, param2,  player2) -> str:
     board = getEmptyBoard()
     game = gameState(board)
     printMode = "none"
+    gameOutcome = None
 
-    while game.gameOutcome is None:
+    while gameOutcome is None:
         # Algorithm 1's turn
         if algo1 == "UR":
-            # TODO
-            pass
+            node = uniform_random(board, player1, printMode)
+            board = node.board
+            gameOutcome = node.checkGameStatus()
+            if gameOutcome is not None:
+                return gameOutcome
         elif algo1 == "DLMM":
-            # TODO
-            pass
+            _, move, board = DLMM(board, param1, player1, True)
+            node = MiniMaxNode(board, player1, True, 5)
+            node.coordinates = move
+            gameOutcome = node.checkGameStatus()
+            if gameOutcome is not None:
+                return gameOutcome
+            
         elif "PMCGS" in algo1:
             move = monteCarloTreeSearch(game, param1, player1, printMode)
+            game.resetToOriginalState()
+            game.checkGameStatus(move.coordinates, player1)
+            if game.gameOutcome is not None:
+                return game.gameOutcome
         elif "UCT" in algo1:
             move = monteCarloTreeSearch(game, param1, player1, printMode, True)
-        
-        game.resetToOriginalState()
-        game.checkGameStatus(move.coordinates, player1)
-
-        if game.gameOutcome is not None:
-            return game.gameOutcome
+            game.resetToOriginalState()
+            game.checkGameStatus(move.coordinates, player1)
+            if game.gameOutcome is not None:
+                return game.gameOutcome
         
         # Algorithm 2's turn
         if algo2 == "UR":
-            # TODO
-            pass
+           node = uniform_random(board, player2, printMode)
+           board = node.board
+           gameOutcome = node.checkGameStatus()
+           if gameOutcome is not None:
+                return gameOutcome
         elif algo2 == "DLMM":
-            # TODO
-            pass
+            _, move, board = DLMM(board, param2, player2, True)
+            node = MiniMaxNode(board, player2, True, 5)
+            node.coordinates = move
+            gameOutcome = node.checkGameStatus()
+            if gameOutcome is not None:
+                return gameOutcome
         elif "PMCGS" in algo2:
             move = monteCarloTreeSearch(game, param2, player2, printMode)
+            game.resetToOriginalState()
+            gameOutcome = game.checkGameStatus(move.coordinates, player2)
         elif "UCT" in algo2:
             move = monteCarloTreeSearch(game, param2, player2, printMode, True)
+            game.resetToOriginalState()
+            gameOutcome = game.checkGameStatus(move.coordinates, player2)
+
         
-        game.resetToOriginalState()
-        game.checkGameStatus(move.coordinates, player2)
-        
-    return game.gameOutcome
+    return gameOutcome
 
 def getEmptyBoard():
     fileName = "emptyBoard.txt"

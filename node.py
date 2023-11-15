@@ -135,7 +135,7 @@ class Node:
     def __getCoordinatesForColumn(self, colIndex):
         if self.__isColumnFull(colIndex):
             return None
-        for i in range(5,0,-1):
+        for i in range(5,-1,-1):
             if self.board[i][colIndex] == "O": # empty spot
                 return [i, colIndex]
         

@@ -8,11 +8,12 @@ from monte_carlo import *
 from mcts_node import *
 from PrettyPrint import PrettyPrintTree
 
+
 # This method starts the game play
 def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, printMode: str):
     print(algorithm)
     if algorithm == "UR":
-        uniform_random(game, nextMovePlayer, printMode)
+        uniform_random(game.simBoard, nextMovePlayer, printMode)
     elif algorithm == "PMCGS":
         move = monteCarloTreeSearch(game, paramValue, nextMovePlayer, printMode)
         print("FINAL Move selected: ", move.coordinates[1]+1)
@@ -20,19 +21,11 @@ def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, 
         move = monteCarloTreeSearch(game, paramValue, nextMovePlayer, printMode, True)
         print("FINAL Move selected: ", move.coordinates[1]+1)
     elif algorithm == "DLMM": 
-        # root node with the initial game state
-        root = MiniMaxNode(game, 'Y', True, paramValue)
+        print("****Depth-Limited Minimax with Alpha-Beta Pruning****")
+        DLMM(game.simBoard, paramValue, nextMovePlayer, True)
 
-        # Evaluate immediate moves and select the final move
-        final_move = root.evaluate_immediate_moves(1)  # Assuming depth 1 for immediate moves
-        
-def printTree(root: Node):
-    pt = PrettyPrintTree(lambda x: x.children, lambda x: x.val())
-    pt(root)
-
-def printBoard(board: list):
-    for row in board:
-        print(row)
+        print("\n****Depth-Limited Minimax****")
+        DLMM(game.simBoard, paramValue, nextMovePlayer, False)
 
 def readFromFile(fileName: str) -> (list, str, int, str):
     algorithm = ""

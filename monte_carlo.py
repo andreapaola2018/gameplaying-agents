@@ -1,7 +1,7 @@
 from gameState import gameState
 from mcts_node import MonteCarloNode
 import random
-from PrettyPrint import PrettyPrintTree
+# from PrettyPrint import PrettyPrintTree
 
 def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: str, printMode: str = "None", uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
@@ -87,7 +87,7 @@ def printTreeMcts(root: MonteCarloNode):
 def printTreeUct(root: MonteCarloNode):
     pt = PrettyPrintTree(lambda x: x.children, lambda x: x.uctValueInt(root.numSims))
     pt(root)
-    
+
 # Given a root and a game state, will select a child node at random (if pure monte carlo) or by using uct
 def selectChildNode(root: MonteCarloNode, gameState: gameState, uct: bool = False) -> MonteCarloNode:
     selected = root

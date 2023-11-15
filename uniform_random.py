@@ -7,7 +7,7 @@ def uniform_random(board: list, nextMovePlayer: str, printMode: str):
     root.generateChildren(nextMovePlayer)
     
     node = generate_random_child(root)
-    print("Move Selected", node)
+    # print("Move Selected", node)
     return node
     
 
@@ -15,8 +15,5 @@ def uniform_random(board: list, nextMovePlayer: str, printMode: str):
 def generate_random_child(root: Node) -> Node:
 
     legal_moves = [n for n in root.children]
-    for child in root.children:
-            print("CHILD", child)
     random_child = random.choice(legal_moves)
-    
     return random_child
