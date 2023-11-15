@@ -5,11 +5,11 @@ import random
 
 def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: str, printMode: str = "None", uct: bool = False):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
-    root = MonteCarloNode(gameState.simBoard, prevMovePlayer)
+    root = MonteCarloNode(prevMovePlayer)
     root.generateChildren(nextMovePlayer, gameState)
     
     # Runs for paramValue times
-    for _ in range(2):
+    for _ in range(paramValue):
         if printMode == "verbose":
             print("Selecting child node...")
             
@@ -47,6 +47,7 @@ def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: 
             backPropagate(node, printMode, gameState)
             
         gameState.resetToOriginalState() # resetting the board for the next simulation
+        # gameState.printBoard()
         
     # if not uct:
     #     printTreeMcts(root)
@@ -70,10 +71,13 @@ def monteCarloTreeSearch(gameState: gameState, paramValue: int, nextMovePlayer: 
     # one based on the direct estimate of the node value. The move is maximized or minimized
     # depending on whose turn it is.    
     if nextMovePlayer == "R": # means we want to minimize
-        return min(root.children, key=lambda n: n.pureMctsValueInt())
+        move = min(root.children, key=lambda n: n.pureMctsValueInt())
+    else:
+        # else it is yellow's turn, so we want to maximize
+        move = max(root.children, key=lambda n: n.pureMctsValueInt())
     
-    # else it is yellow's turn, so we want to maximize
-    return max(root.children, key=lambda n: n.pureMctsValueInt())
+    gameState.makeMove(move.coordinates, move.player)
+    return move
 
 # These 2 methods should be removed before submitting
 def printTreeMcts(root: MonteCarloNode):
@@ -88,6 +92,7 @@ def printTreeMcts(root: MonteCarloNode):
 def selectChildNode(root: MonteCarloNode, gameState: gameState, uct: bool = False) -> MonteCarloNode:
     selected = root
     while len(selected.children) != 0: # while we have not found a leaf node
+        # print("Selected: ", selected.coordinates)
         maxSims = max(selected.children, key=lambda n: n.numSims).numSims
         
         if maxSims == 0: # this means that none of the children have been explored (no simulations have been run in any!)
@@ -129,9 +134,10 @@ def selectChildNode(root: MonteCarloNode, gameState: gameState, uct: bool = Fals
 # Expands the given node using the gameState to make the move
 def expand(node: MonteCarloNode, printMode: str, gameState: gameState) -> bool:
     # first check if selected node to expand on is a winning or draw move
-    # if so, cannot expand further, so return False
-    gameState.makeMove(node.coordinates, node.player)
+    # if so, cannot expand further, so return False  
+    gameState.makeSimMove(node.coordinates, node.player)
     gameStatus = gameState.checkGameStatus(node.coordinates, node.player)
+    
     if gameStatus == -1 or gameStatus == 0 or gameStatus == 1:   
         if printMode == "verbose":
             print("TERMINAL NODE VALUE: ", gameStatus, "\n")
@@ -154,7 +160,7 @@ def rollOut(node: MonteCarloNode, printMode: str, gameState: gameState):
             print("wi: ", nextMove.wins)
             print("ni: ", nextMove.numSims)
         nextMove = random.choice(nextMove.children)
-        gameState.makeMove(nextMove.coordinates, nextMove.player)
+        gameState.makeSimMove(nextMove.coordinates, nextMove.player)
         
         if printMode == "brief" or printMode == "verbose":
             print("Move selected: ", nextMove.coordinates[1]+1, "\n")
@@ -176,6 +182,8 @@ def rollOut(node: MonteCarloNode, printMode: str, gameState: gameState):
             # Note: This if statement is here as a precaution, given the if statement above, this should never happen
             print("Children empty, game status: ", gameStatus)
             print("current child: ", nextMove)
+            print("Board:")
+            gameState.printBoard()
             break
 
     return nextMove # return the leaf node that we end up at and the game outcome
@@ -189,6 +197,8 @@ def backPropagate(leaf: MonteCarloNode, printMode: str, gameState: gameState):
     if gameState.gameOutcome is None: # this is here as a precaution and should never happen
         print("Error in leaf node")
         print("Leaf that has error: ", leaf)
+        print("Board")
+        gameState.printBoard()
         return
     
     # While we have not reached the root node we back propagate
