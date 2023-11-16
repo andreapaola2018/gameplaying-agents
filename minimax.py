@@ -32,16 +32,16 @@ class MiniMaxNode:
             if not self.__isColumnFull(i):
                 coordinates = self.__getCoordinatesForColumn(i)
                 if coordinates:  # if column is not full, generate a child
-                    maximizingPlayer_for_opponent = not self.maximizingPlayer  # Opponent's turn
-                    child = MiniMaxNode(
-                        self.board, nextMovePlayer, maximizingPlayer_for_opponent, depth, parent=None)
+                    child = MiniMaxNode(self.board, nextMovePlayer, not self.maximizingPlayer, depth-1, parent=None)
                     child.coordinates = self.__getCoordinatesForColumn(i)
                     self.__generateBoardForChild(child)
                     self.children.append(child)
-                    # Generate children for the opponent's subsequent moves
+                    if child.checkGameStatus() in [-1,1]: 
+                        return
+                    # Generate children for the opponent's moves
                     if depth > 1:  # Considering the depth limit
                         child.generateChildren(
-                            "R" if nextMovePlayer == "Y" else "Y", maximizingPlayer_for_opponent, depth - 1)
+                            "R" if nextMovePlayer == "Y" else "Y", not self.maximizingPlayer, depth - 1)
                             
     # Checks the current state of the board to see if the move made is a win, loss, or neither move
     def checkGameStatus(self) -> str:
@@ -170,40 +170,41 @@ class MiniMaxNode:
             if game_result is None:
                 # return heuristic and no selected move for non-terminal states
                 return self.heuristic_evaluation(), None
-            return game_result, None
+            return game_result, self.coordinates if self.coordinates else None
 
         if self.maximizingPlayer:
             max_eval = float('-inf')
-            selected_move = []
+            selected_move = None
             for child in self.children:
                 eval, _ = child.minimax(depth - 1)
                 if eval > max_eval:
                     max_eval = eval
                     selected_move = child.coordinates
-            return max_eval, selected_move if selected_move is not None else None
+            return max_eval, selected_move
         else:
             min_eval = float('inf')
-            selected_move = []
+            selected_move = None
             for child in self.children:
                 eval, _ = child.minimax(depth - 1)
                 if eval < min_eval:
                     min_eval = eval
                     selected_move = child.coordinates
-            return min_eval, selected_move if selected_move is not None else None
+            return min_eval, selected_move
 
     def minimax_alpha_beta(self, depth, alpha, beta):   
         game_result = self.checkGameStatus()
         
+        ##if depth is reached or game is over 
         if depth == 0 or game_result is not None:
-            # game is not over
+             # if depth is reached but game is not over, there is still valid moves 
             if game_result is None:
                 ##return heuristic and no selected move for non-terminal states
                 return self.heuristic_evaluation(), None
-            return game_result, None 
+            return game_result, self.coordinates if self.coordinates else None
 
         if self.maximizingPlayer:
             max_eval = float('-inf')
-            selected_move = []
+            selected_move = None
             for child in self.children:
                 eval, _ = child.minimax_alpha_beta(depth - 1, alpha, beta)
                 if eval > max_eval: 
@@ -212,10 +213,10 @@ class MiniMaxNode:
                 alpha = max(alpha, eval)
                 if beta <= alpha:
                     break
-            return max_eval, selected_move if selected_move is not None else None
+            return max_eval, selected_move
         else:
             min_eval = float('inf')
-            selected_move = []
+            selected_move = None
             for child in self.children:
                 eval, _ = child.minimax_alpha_beta(depth - 1, alpha, beta)
                 if eval < min_eval: 
@@ -224,7 +225,7 @@ class MiniMaxNode:
                 beta = min(beta, eval)
                 if beta <= alpha:
                     break
-            return min_eval, selected_move if selected_move is not None else None
+            return min_eval, selected_move
 
     def heuristic_evaluation(self):
         player = self.player
@@ -234,17 +235,19 @@ class MiniMaxNode:
         player_lines_2 = self.count_lines_of_length(2, player)
         player_lines_3 = self.count_lines_of_length(3, player)
 
+
         # Check lines for the opponent
         opponent_lines_2 = self.count_lines_of_length(2, opponent)
         opponent_lines_3 = self.count_lines_of_length(3, opponent)
 
+
         # Calculate heuristic
-        player_score = player_lines_2 + 2 * player_lines_3
-        opponent_score = opponent_lines_2 + 2 * opponent_lines_3
+        player_score = player_lines_2 + 2 * player_lines_3 
+        opponent_score = opponent_lines_2 + 2 * opponent_lines_3 
 
         # Normalize scores and return a value between -1 and 1
         total_score = player_score - opponent_score
-        max_possible_score = 2 * (self.count_lines_of_length(3, "R") +
+        max_possible_score = 4 * (self.count_lines_of_length(3, "R") +
              self.count_lines_of_length(3, "Y"))
         if max_possible_score != 0: 
             heuristic_value = total_score / max_possible_score
@@ -312,14 +315,15 @@ def DLMM(board, depth, nextMovePlayer, isAlphaBeta):
         elapsed_time = time.time() - start_time
         # print(f"Total Elapsed Time without Pruning: {elapsed_time} seconds")
 
-    
-    if selected_move == None: 
+    if selected_move is None: 
         print("No valid moves")
+        return result, None, None
 
     print("Output: ")
     root_node.output()
 
-    print("FINAL Move selected: ", selected_move[1]+1)
-    root_node.board[selected_move[0]][selected_move[1]] = nextMovePlayer 
+    print("FINAL Move selected: ", selected_move[1]+1, selected_move)
+    if selected_move: 
+        root_node.board[selected_move[0]][selected_move[1]] = nextMovePlayer 
 
     return result, selected_move, root_node.board
