@@ -21,10 +21,10 @@ def play(game: gameState, algorithm: str, paramValue: int, nextMovePlayer: str, 
         print("FINAL Move selected: ", move.coordinates[1]+1)
     elif algorithm == "DLMM": 
         print("****Depth-Limited Minimax with Alpha-Beta Pruning****")
-        DLMM(game.simBoard, paramValue, nextMovePlayer, True)
+        DLMM(game.simBoard, paramValue, nextMovePlayer, True, True)
 
         print("\n****Depth-Limited Minimax****")
-        DLMM(game.simBoard, paramValue, nextMovePlayer, False)
+        DLMM(game.simBoard, paramValue, nextMovePlayer, False, True)
 
 def readFromFile(fileName: str) -> (list, str, int, str):
     algorithm = ""

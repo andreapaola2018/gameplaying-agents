@@ -292,11 +292,12 @@ class MiniMaxNode:
             eval = child.heuristic_evaluation()
             print(f"Column {child.coordinates[1] + 1}: {eval}" if eval is not None else f"Column {child.coordinates[1] + 1}: Null")
 
-def DLMM(board, depth, nextMovePlayer, isAlphaBeta): 
+def DLMM(board, depth, nextMovePlayer, isAlphaBeta, printMode): 
+    
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
 
     root_node = MiniMaxNode(board, prevMovePlayer, True, depth)
-
+    
     # Generate children nodes (possible moves)
     root_node.generateChildren(nextMovePlayer, not root_node.maximizingPlayer, depth)
 
@@ -312,14 +313,16 @@ def DLMM(board, depth, nextMovePlayer, isAlphaBeta):
         elapsed_time = time.time() - start_time
         # print(f"Total Elapsed Time without Pruning: {elapsed_time} seconds")
 
-    
-    if selected_move == None: 
-        print("No valid moves")
+    if printMode == True: 
+        if selected_move == None: 
+            print("No valid moves")
 
-    print("Output: ")
-    root_node.output()
+        print("Output: ")
+        root_node.output()
 
-    print("FINAL Move selected: ", selected_move[1]+1)
+        print("FINAL Move selected: ", selected_move[1]+1)
+
     root_node.board[selected_move[0]][selected_move[1]] = nextMovePlayer 
 
     return result, selected_move, root_node.board
+

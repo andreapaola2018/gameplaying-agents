@@ -1,12 +1,13 @@
 from node import Node
 import random
 
-def uniform_random(board: list, nextMovePlayer: str, printMode: str):
+def uniform_random(board: list, nextMovePlayer: str, printMode, shouldPrint):
     prevMovePlayer = "Y" if nextMovePlayer == "R" else "R"
     root = Node(board, prevMovePlayer)
     root.generateChildren(nextMovePlayer)
     node = generate_random_child(root)
-    # print("Move Selected", node)
+    if shouldPrint == True: 
+        print("Move Selected", node)
     return node
     
 

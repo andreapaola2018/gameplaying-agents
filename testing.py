@@ -53,14 +53,14 @@ def playGame(algo1, param1, player1, algo2, param2,  player2) -> str:
     while gameOutcome is None:
         # Algorithm 1's turn
         if algo1 == "UR":
-            node = uniform_random(board, player1, printMode)
+            node = uniform_random(board, player1, printMode, False)
             board = node.board
             gameOutcome = node.checkGameStatus()
             if gameOutcome is not None:
                 return gameOutcome
         elif algo1 == "DLMM":
             pass
-            # _, move, board = DLMM(board, param1, player1, True)
+            # _, move, board = DLMM(board, param1, player1, True, False)
             # node = MiniMaxNode(board, player1, True, 5)
             # node.coordinates = move
             # gameOutcome = node.checkGameStatus()
@@ -82,14 +82,14 @@ def playGame(algo1, param1, player1, algo2, param2,  player2) -> str:
         
         # Algorithm 2's turn
         if algo2 == "UR":
-           node = uniform_random(board, player2, printMode)
+           node = uniform_random(board, player2, printMode, False)
            board = node.board
            gameOutcome = node.checkGameStatus()
            if gameOutcome is not None:
                 return gameOutcome
         elif algo2 == "DLMM":
             pass
-            # _, move, board = DLMM(board, param2, player2, True)
+            # _, move, board = DLMM(board, param2, player2, True, False)
             # node = MiniMaxNode(board, player2, True, 5)
             # node.coordinates = move
             # gameOutcome = node.checkGameStatus()
